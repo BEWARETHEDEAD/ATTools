@@ -20,7 +20,8 @@ pip install git+https://github.com/BEWARETHEDEAD/ATools.git
 -
 - [Payment Systems](#payment-systems)
     - [xJetSwap](#xjetswap)
-        - [xJet About](#xjet-about) 
+        - [xJet About](#xjet-about)
+        - [xJet Invoices](#xjet-invoices) 
 ## Rest Requests
 ```python
 import ATools
@@ -148,4 +149,9 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       
       withdraw = await xJet.Withdraw(address: str, currency: str, amount: float)
       operations = await xJet.Operations(limit: int, offset: int)
+      ```
+      
+    - ### xJet Invoices
+      ```python
+
       ```
