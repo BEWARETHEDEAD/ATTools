@@ -235,4 +235,5 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       exchange_create_order = await xJet.ExchangeCreateOrder(tokens: list = ['left', 'right'], type: str = 'buy' or 'sell', amount: int, min_receive_amount: int)
       exchange_order_status = await xJet.ExchangeOrderStatus(order_id: str)
       ```
+      
 - ## TonRocket
