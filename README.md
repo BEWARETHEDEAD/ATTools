@@ -24,6 +24,7 @@ pip install git+https://github.com/BEWARETHEDEAD/ATools.git
         - [xJet Invoices](#xjet-invoices)
         - [xJet Cheques](#xjet-cheques)
         - [xJet NFT](#xjet-nft)
+        - [xJet Exchange](#xjet-exchange)
 ## Rest Requests
 ```python
 import ATools
@@ -210,4 +211,24 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       nft_list = await xJet.NftList()
       nft_transfer = await xJet.NftTransfer(nft_address: str, destination_address: str)
 
+      ```
+      
+    - ### xJet Exchange
+      ```python
+      import ATools
+
+      
+      ATools.Payments.xJet(
+          api_key: str,
+          private_key: str
+      )
+      
+      
+      xJet = ATools.Payments.xJet
+
+      # Exchange methods
+      exchange_pairs = await xJet.ExchangePairs()
+      exchange_estimate = await xJet.ExchangeEstimate(tokens: list = ['left', 'right'], type: str = 'buy' or 'sell', amount: int)
+      exchange_create_order = await xJet.ExchangeCreateOrder(tokens: list = ['left', 'right'], type: str = 'buy' or 'sell', amount: int, min_receive_amount: int)
+      exchange_order_status = await xJet.ExchangeOrderStatus(order_id: str)
       ```
