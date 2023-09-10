@@ -87,3 +87,26 @@ wallet_address = wallet.address
 wallet_balance = await wallet.balance
 wallet_transactions = await wallet.transactions
 ```
+
+## Wallet Manager
+```python
+import ATools
+
+
+tonconnect_obj = await ATools.WalletManager.TonConnect(url_path_to_json: str, provider: str, payload: str)
+
+# answer data
+
+connector = tonconnect_obj[0]
+connect_url = tonconnect_obj[1]
+
+# connected wallet address
+
+address = await connector.get_address()
+
+
+
+wallet_transactions = await ATools.WalletManager.GetTransactions(address: str, limit: int, offset: int)
+wallet_info = await ATools.WalletManager.GetInfoByWallet(address: str)
+wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
+```
