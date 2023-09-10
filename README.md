@@ -10,28 +10,28 @@ pip install git+https://github.com/BEWARETHEDEAD/ATools.git
 
 
 **Navigation**
-- [Rest Requests](#rest-requests)
+- [🔗 Rest Requests](#rest-requests)
 -
-- [Jettons](#jettons)
+- [🌕 Jettons](#jettons)
     - [Jetton Analyze](#jetton-analyze)
 -     
-- [Wallet](#wallet)
+- [👛 Wallet](#wallet)
     - [Wallet Manager](#wallet-manager)
 -
-- [Payment Systems](#payment-systems)
-    - [xJetSwap](#xjetswap)
+- [🏦 Payment Systems](#payment-systems)
+    - [🟥 xJetSwap](#xjetswap)
         - [xJet About](#xjet-about)
         - [xJet Invoices](#xjet-invoices)
         - [xJet Cheques](#xjet-cheques)
         - [xJet NFT](#xjet-nft)
         - [xJet Exchange](#xjet-exchange)
 
-    - [TonRocket](#tonrocket)
+    - [🟦 TonRocket](#tonrocket)
         - [TonRocket About](#tonrocket-about)
         - [TonRocket Invoices](#tonrocket-invoices)
         - [TonRocket Cheques](#tonrocket-cheques)
      
-## Rest Requests
+## 🔗 Rest Requests
 ```python
 import ATools
 
@@ -50,7 +50,7 @@ text_answer = response.text
 response = await response.update()
 ```
 
-## Jettons
+## 🌕 Jettons
 ```python
 import ATools
 
@@ -90,7 +90,7 @@ jetton_lp_price = await ATools.Analyze.GetLpPrice(contract: str)
 jettonwallet_owner = await ATools.Analyze.GetJettonwalletOwner(jettonwallet_address: str)
 ```
 
-## Wallet
+## 👛 Wallet
 ```python
 import ATools
 
@@ -128,9 +128,9 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
 ```
 
 
-# Payment Systems
+# 🏦 Payment Systems
 
-- ## xJetSwap
+- ## 🟥 xJetSwap
     - ### xJet About
       ```python
       import ATools
@@ -239,7 +239,7 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       exchange_order_status = await xJet.ExchangeOrderStatus(order_id: str)
       ```
       
-- ## TonRocket
+- ## 🟦 TonRocket
     - ### TonRocket About
       ```python
       import ATools
