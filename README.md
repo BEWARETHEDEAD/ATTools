@@ -13,7 +13,8 @@ cur: v.0.1.1
 Rest Requests
 =============================
 
-`import ATools
+```
+import ATools
 
 response = await ATools.Rest.get(url: str, headers: dict, data: dict, json: dict) 
 # or
@@ -28,4 +29,4 @@ text_answer = response.text
 # sending a repeated request by a variable reference
 
 response = await response.update()
-`
+```
