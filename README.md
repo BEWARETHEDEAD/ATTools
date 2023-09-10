@@ -12,6 +12,7 @@ pip install git+https://github.com/BEWARETHEDEAD/ATools.git
 **Navigation**
 - [Rest Requests](#rest-requests)
 - [Jettons](#jettons)
+    - [Jetton Analyze](#jetton-analyze)
 
 ## Rest Requests
 ```python
@@ -52,4 +53,22 @@ jetton_providers = await jetton.providers
 # sending a repeated request by a variable reference
 
 jetton = await jetton.update()
+```
+
+## Jetton Analyze
+```python
+import ATools
+
+
+jetton_full_info = await ATools.Analyze.GetJettonFullInfo(token_name: str)
+jetton_pair = await ATools.Analyze.GetJettonPair(token_name: str)
+jetton_info = await ATools.Analyze.GetJettonInfo(contract: str)
+jetton_price = await ATools.Analyze.GetJettonPrice(contract: str)
+jetton_liquidity = await ATools.Analyze.GetJettonLiquidity(token_name: str)
+jetton_graph_data = await ATools.Analyze.GetJettonGraphData(token_name: str)
+jetton_providers = await ATools.Analyze.GetJettonProviders(lp_contract: str)
+jetton_holders = await ATools.Analyze.GetHoldersByContract(contract: str, limit: int)
+jetton_lp_price = await ATools.Analyze.GetLpPrice(contract: str)
+
+jettonwallet_owner = await ATools.Analyze.GetJettonwalletOwner(jettonwallet_address: str)
 ```
