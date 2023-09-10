@@ -11,13 +11,13 @@ pip install git+https://github.com/BEWARETHEDEAD/ATools.git
 
 **Navigation**
 - [Rest Requests](#rest-requests)
-  
+-
 - [Jettons](#jettons)
     - [Jetton Analyze](#jetton-analyze)
-      
+-     
 - [Wallet](#wallet)
     - [Wallet Manager](#wallet-manager)
-      
+-
 - [Payment Systems](#payment-systems)
     - [xJetSwap](#xjetswap)
         - [xJet About](#xjet-about) 
