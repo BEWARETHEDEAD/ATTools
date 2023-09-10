@@ -8,6 +8,13 @@ cur: v.0.1.1
 pip install git+https://github.com/BEWARETHEDEAD/ATools.git
 ```
 
+# ⏳ Soon
+- ## Payment Systems:
+    - ### CryptoBot
+      
+- ## Data:
+    - ### Wrapping JSON data to a namespace object
+
 
 **Navigation**
 - [🔗 Rest Requests](#rest-requests)
