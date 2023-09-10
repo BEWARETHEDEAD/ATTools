@@ -13,7 +13,7 @@ cur: v.0.1.1
 Rest Requests
 =============================
 
-```
+```python
 import ATools
 
 response = await ATools.Rest.get(url: str, headers: dict, data: dict, json: dict) 
