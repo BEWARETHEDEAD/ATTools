@@ -117,6 +117,6 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
 
 ## Payment Systems
 
-- xJetSwap
-    - ## xJet About
+- # xJetSwap
+    - ### xJet About
   
