@@ -15,7 +15,9 @@ pip install git+https://github.com/BEWARETHEDEAD/ATools.git
     - [Jetton Analyze](#jetton-analyze)
 - [Wallet](#wallet)
     - [Wallet Manager](#wallet-manager)
-  
+- [Payment Systems](#payment-systems)
+    - [xJetSwap](#xjetswap)
+          - [xJet About](#xjet-about)
 ## Rest Requests
 ```python
 import ATools
@@ -111,3 +113,10 @@ wallet_transactions = await ATools.WalletManager.GetTransactions(address: str, l
 wallet_info = await ATools.WalletManager.GetInfoByWallet(address: str)
 wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
 ```
+
+
+## Payment Systems
+
+- xJetSwap
+    - ## xJet About
+  
