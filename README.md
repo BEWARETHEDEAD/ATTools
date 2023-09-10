@@ -1,4 +1,4 @@
-# ATools
+ # ATools
 Tools For TON
 
 cur: v.0.1.1
@@ -12,9 +12,7 @@ pip install git+https://github.com/BEWARETHEDEAD/ATools.git
 **Navigation**
 - [Rest Requests](#rest-requests)
 
-Rest Requests
-=============================
-
+##Rest Requests
 ```python
 import ATools
 
