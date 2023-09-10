@@ -11,6 +11,7 @@ pip install git+https://github.com/BEWARETHEDEAD/ATools.git
 
 **Navigation**
 - [Rest Requests](#rest-requests)
+- [Jettons](#jettons)
 
 ## Rest Requests
 ```python
