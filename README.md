@@ -27,6 +27,9 @@ pip install git+https://github.com/BEWARETHEDEAD/ATools.git
         - [xJet Exchange](#xjet-exchange)
 
     - [TonRocket](#tonrocket)
+        - [TonRocket About](#tonrocket-about)
+        - [TonRocket Invoices](#tonrocket-invoices)
+        - [TonRocket Cheques](#tonrocket-cheques)
      
 ## Rest Requests
 ```python
@@ -237,3 +240,42 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       ```
       
 - ## TonRocket
+    - ### TonRocket About
+      ```python
+      import ATools
+
+      ATools.Payments.TonRocket.api = ''
+      
+      TR = ATools.Payments.TonRocket
+      
+      # About
+      info = await ATools.TR.Info()
+      transfer = await ATools.TR.Transfer(user_id: int, currency: str, amount: float, transfer_id: str, description: str)
+      withdrawal = await ATools.TR.Withdrawal(destination_address: str, currency: str, amount: float, withdrawal_id: str, comment: str)
+
+      ```
+      
+    - ### TonRocket Invoices
+      ```python
+      import ATools
+
+      ATools.Payments.TonRocket.api = ''
+      
+      TR = ATools.Payments.TonRocket
+      
+      # Invoice methods
+      invoice = await ATools.TR.CreateInvoice(amount: float, minPayment: float, numPayments: int, currency: str, description: str, hiddenMessage: str, commentsEnabled: bool, callbackUrl: str, payload: str, expiredIn: int)
+
+      ```
+
+    - ### TonRocket Cheques
+      ```python
+      import ATools
+
+      ATools.Payments.TonRocket.api = ''
+      
+      TR = ATools.Payments.TonRocket
+      
+      # Cheque methods
+      cheque = await ATools.TR.CreateCheque(currency: str, chequePerUser: float, usersNumber: int, refProgram: int, password: str, description: str, sendNotification: bool, enableCaptcha: bool, telegramResourcesIds: list, forPremium: bool, linkedWallet: bool, disabledLanguages: list)
+      ```
