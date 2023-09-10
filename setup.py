@@ -10,8 +10,7 @@ setup(
         'tonconnect',
         'dedust',
         'xjet',
-        'tontools',
-        'functools'        
+        'tontools',     
     ],
     python_requires='>=3.7',
 )
