@@ -13,7 +13,7 @@ pip install git+https://github.com/BEWARETHEDEAD/ATools.git
     - CryptoBot
       
 - Data:
-    - Wrapping JSON data to a namespace object
+    - Wrapping JSON-answer data to a namespace object
 
 
 
