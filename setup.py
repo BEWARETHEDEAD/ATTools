@@ -7,7 +7,6 @@ setup(
     install_requires=[
         'tontools',
         'xjet',
-        'traceback',
         'dedust',
         'tonconnect',
         'aiohttp',
