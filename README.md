@@ -16,9 +16,8 @@ pip install git+https://github.com/BEWARETHEDEAD/ATools.git
 - [Wallet](#wallet)
     - [Wallet Manager](#wallet-manager)
 - [Payment Systems](#payment-systems)
-- 
-- [xJetSwap](#xjetswap)
-            - [xJet About](#xjet-about)
+    - [xJetSwap](#xjetswap)
+    - 
 ## Rest Requests
 ```python
 import ATools
