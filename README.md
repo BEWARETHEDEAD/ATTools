@@ -15,8 +15,9 @@ pip install git+https://github.com/BEWARETHEDEAD/ATools.git
 - Data:
     - Wrapping JSON data to a namespace object
 -
-
-#**Navigation**
+-
+-
+#Navigation
 - [🔗 Rest Requests](#rest-requests)
 -
 - [🌕 Jettons](#jettons)
