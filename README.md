@@ -13,7 +13,8 @@ pip install git+https://github.com/BEWARETHEDEAD/ATools.git
 - [Rest Requests](#rest-requests)
 - [Jettons](#jettons)
     - [Jetton Analyze](#jetton-analyze)
-
+- [Wallet](#wallet)
+  
 ## Rest Requests
 ```python
 import ATools
@@ -71,4 +72,18 @@ jetton_holders = await ATools.Analyze.GetHoldersByContract(contract: str, limit:
 jetton_lp_price = await ATools.Analyze.GetLpPrice(contract: str)
 
 jettonwallet_owner = await ATools.Analyze.GetJettonwalletOwner(jettonwallet_address: str)
+```
+
+## Wallet
+```python
+import ATools
+
+
+wallet = await ATools.Wallets(toncenter_api_key: str, mnemonics: str)
+
+# answer data
+
+wallet_address = wallet.address
+wallet_balance = await wallet.balance
+wallet_transactions = await wallet.transactions
 ```
