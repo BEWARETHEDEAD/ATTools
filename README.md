@@ -120,4 +120,30 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
 
 - ## xJetSwap
     - ### xJet About
-  
+      ```python
+      import ATools
+
+      
+      ATools.Payments.xJet(
+          api_key: str,
+          private_key: str
+      )
+      
+      
+      xJet = ATools.Payments.xJet
+      
+      
+      # Backend Methods
+      longpool = await xJet.LongPool()
+      
+      
+      
+      # About
+      currencys = await xJet.Currencies()
+      me = await xJet.Me()
+      balance = await xJet.Balance()
+      sumbit_deposit = await xJet.SubmitDeposit()
+      
+      withdraw = await xJet.Withdraw(address: str, currency: str, amount: float)
+      operations = await xJet.Operations(limit: int, offset: int)
+      ```
