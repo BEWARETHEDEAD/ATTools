@@ -14,6 +14,7 @@ pip install git+https://github.com/BEWARETHEDEAD/ATools.git
 - [Jettons](#jettons)
     - [Jetton Analyze](#jetton-analyze)
 - [Wallet](#wallet)
+    - [Wallet Manager](#wallet-manager)
   
 ## Rest Requests
 ```python
