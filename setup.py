@@ -12,4 +12,5 @@ setup(
         'aiohttp',
         'asyncio',
     ],
+    python_requires='>=3.7',
 )
