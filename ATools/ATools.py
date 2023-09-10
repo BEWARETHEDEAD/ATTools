@@ -1,13 +1,23 @@
 from argparse import Namespace
 from types import SimpleNamespace as Namespace
+from functools import wraps #pip install functools
+from types import FunctionType
+from types import MethodType
+from types import GeneratorType
+from typing import Any
+from types import CoroutineType
 import asyncio #pip install asyncio
 import aiohttp #pip install aiohttp
 from tonconnect.connector import AsyncConnector #pip install tonconnect
 from dedust.api import API #pip install dedust
 from dedust.tokens import Token #pip install dedust
 import traceback
-from xjet import JetAPI
+from xjet import JetAPI #pip install xjet
 from TonTools import * #pip install tontools
+import inspect
+import functools #pip install functools
+
+
 
 # DEV's:
 # @dmitriypyc (help)
@@ -40,38 +50,38 @@ class Rest():
 		self.json = json
 
 
-	async def get(url: str, headers: dict = None, data: dict = None):
+	async def get(url: str, headers: dict = None, data: dict = None, json: dict = None):
 
 		response_status = None
 		response_text = None
 		response_json = None
 
 		async with aiohttp.ClientSession(headers=headers) as session:
-			response = await session.get(url=url, json=data)
+			response = await session.get(url=url, json=json, data=data)
 
 			response_status = response.status
 
 			response_text = await response.text(encoding='UTF-8')
 			response_json = await response.json()
 
-		return Response(type='get', url=url, headers=headers, data=data, status=response_status, text=response_text, json=response_json)
+		return Response(type='get', url=url, headers=headers, json_data=json, data=data, status=response_status, text=response_text, json=response_json)
 
 
-	async def post(url: str, headers: dict = None, data: dict = None):
+	async def post(url: str, headers: dict = None, data: dict = None, json: dict = None):
 
 		response_status = None
 		response_text = None
 		response_json = None
 
 		async with aiohttp.ClientSession(headers=headers) as session:
-			response = await session.post(url=url, json=data)
+			response = await session.post(url=url, json=json, data=data)
 
 			response_status = response.status
 
 			response_text = await response.text(encoding='UTF-8')
 			response_json = await response.json()
 
-		return Response(type='post', url=url, headers=headers, data=data, status=response_status, text=response_text, json=response_json)
+		return Response(type='post', url=url, headers=headers, json_data=json, data=data, status=response_status, text=response_text, json=response_json)
 
 
 
@@ -203,7 +213,7 @@ class Analyze():
 					}
 				}
 
-				jetton_resp = await Rest.post(url=f'https://toncenter.com/api/v2/jsonRPC', data=toncenter_payload)
+				jetton_resp = await Rest.post(url=f'https://toncenter.com/api/v2/jsonRPC', json=toncenter_payload)
 				jetton_liquidity = int(jetton_resp.json["result"]["stack"][0][1], 16) / 1e9
 				break
 
@@ -274,18 +284,102 @@ class WalletManager():
 # Payment systems
 class Payments():
 
+	
 	class xJet():
 
-		api = None
+		def __init__(self, api_key, private_key, network='mainnet'):
+			self.api_key = api_key
+			self.private_key = private_key
+			self.network = network
 
+			Payments.xJet.api = JetAPI(
+				api_key=self.api_key,
+				private_key=self.private_key,
+				network=self.network
+			)
+
+
+
+		# Backend Methods
+		@classmethod
+		async def LongPool(cls):
+			try:
+
+				headers = {
+					'X-API-Key': cls.api.api_key
+				}
+
+				response = await Rest.get(url='http://xjet.app/api/v1/account.events', headers=headers)
+
+				return response.json
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'xjet error'
+
+
+
+
+
+		# About
+		@classmethod
+		async def Currencies(cls):
+
+			return await xjet.currencies()
+
+
+		@classmethod
+		async def Me(cls):
+
+			return await cls.api.me()
+
+
+		@classmethod
+		async def Balance(cls):
+
+			return await cls.api.balance()
+
+
+		@classmethod
+		async def SubmitDeposit(cls):
+
+			return await cls.api.submit_deposit()
+
+
+		@classmethod
+		async def Withdraw(cls, address: str = '', currency: str = '', amount: float = 0):
+
+			try:
+
+				return await cls.api.withdraw(address, currency, amount)
+
+			except Exception as e:
+				return 'xjet error'
+				traceback.print_exc()
+
+
+		@classmethod
+		async def Operations(cls, limit: int = 0, offset: int = 0):
+
+			try:
+
+				return await cls.api.operations(limit, offset)
+
+			except Exception as e:
+				return 'xjet error'
+				traceback.print_exc()
+
+
+
+
+
+		# Invoices
 		@classmethod
 		async def CreateInvoice(cls, currency: str = '', amount: float = 0, description: str = '', max_payments: int = 1):
 
 			try:
 
-				invoice = await cls.api.invoice_create(currency, amount, description, max_payments)
-
-				return invoice
+				return await cls.api.invoice_create(currency, amount, description, max_payments)
 
 			except Exception as e:
 				traceback.print_exc()
@@ -293,23 +387,259 @@ class Payments():
 
 
 		@classmethod
-		async def CreateCheque(cls, currency: str = '', amount: int = 0, expires: int = 0, description: str = '', activates_count: int = 0, groups_id: int = None, personal_id:int = 0, password: str = None):
+		async def InvoiceStatus(cls, invoice_id: str = ''):
 
 			try:
 
-				cheque = await cls.api.cheque_create(currency, amount, expires, description, activates_count, groups_id, personal_id, password) # create cheque
-
-				return cheque
+				return await cls.api.invoice_status(invoice_id)
 
 			except Exception as e:
 				traceback.print_exc()
 				return 'xjet error'
 
 
+		@classmethod
+		async def InvoiceList(cls):
+
+			try:
+
+				return await cls.api.invoice_list()
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'xjet error'
+
+
+
+
+
+		# Cheques
+		@classmethod
+		async def CreateCheque(cls, currency: str = '', amount: int = 0, expires: int = 0, description: str = '', activates_count: int = 0, groups_id: int = None, personal_id:int = 0, password: str = None):
+
+			try:
+
+				return await cls.api.cheque_create(currency, amount, expires, description, activates_count, groups_id, personal_id, password) # create cheque
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'xjet error'
+
+
+		@classmethod
+		async def ChequeStatus(cls, cheque_id: str = ''):
+
+			try:
+
+				return await cls.api.cheque_status(cheque_id)
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'xjet error'
+
+
+		@classmethod
+		async def ChequeList(cls):
+
+			try:
+
+				return await cls.api.cheque_list() 
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'xjet error'
+
+
+		@classmethod
+		async def ChequeCancel(cls, cheque_id: str = ''):
+
+			try:
+
+				return await cls.api.cheque_cancel(cheque_id)
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'xjet error'
+
+
+
+
+
+		# NFT methods
+		@classmethod
+		async def NftList(cls):
+
+			try:
+
+				return await cls.api.nft_list()
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'xjet error'
+
+
+		@classmethod
+		async def NftTransfer(cls, nft_address: str = '', destination_address: str = ''):
+
+			try:
+
+				return await cls.api.nft_transfer(nft_address, destination_address)
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'xjet error'
+
+
+
+
+		# Exchange methods
+		@classmethod
+		async def ExchangePairs(cls):
+
+			try:
+
+				return await cls.api.exchange_pairs()
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'xjet error'
+
+
+		@classmethod
+		async def ExchangeEstimate(cls, tokens: list = ['left', 'right'], type: str = '', amount: int = 0):
+
+			try:
+
+				return await cls.api.exchange_estimate(tokens, type, amount)
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'xjet error'
+
+
+		@classmethod
+		async def ExchangeCreateOrder(cls, tokens: list = ['left', 'right'], type: str = '', amount: int = 0, min_receive_amount: int = 0):
+
+			try:
+
+				return await cls.api.exchange_create_order(tokens, type, amount, min_receive_amount)
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'xjet error'
+
+
+		@classmethod
+		async def ExchangeOrderStatus(cls, order_id: str = ''):
+
+			try:
+
+				return await cls.api.exchange_order_status(order_id)
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'xjet error'
+
+
+
+	
 	class TonRocket():
 
 		api = None
 
+
+		# About
+		@classmethod
+		async def Info(cls):
+
+			try:
+
+				headers = {
+					'accept': 'application/json',
+					'Rocket-Pay-Key': str(cls.api),
+					'Content-Type': 'application/json',
+				}
+
+				url = 'https://pay.ton-rocket.com/app/info'
+				resp = await Rest.get(url=url, headers=headers)
+
+				return resp.json
+
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'tonrocket error'
+
+
+
+
+
+		# App methods
+		@classmethod
+		async def Transfer(cls, user_id: int = 0, currency: str = '', amount: float = 0, transfer_id: str = '', description: str = ''):
+
+			try:
+
+				headers = {
+					'accept': 'application/json',
+					'Rocket-Pay-Key': str(cls.api),
+					'Content-Type': 'application/json',
+				}
+
+				data = {
+					"tgUserId": user_id,
+					"currency": currency,
+					"amount": amount,
+					"transferId": transfer_id,
+					"description": description
+				}
+
+				url = 'https://pay.ton-rocket.com/app/transfer'
+				resp = await Rest.post(url=url, headers=headers, json=data)
+
+				return resp.json
+
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'tonrocket error'
+
+
+		@classmethod
+		async def Withdrawal(cls, destination_address: str = '', currency: str = '', amount: float = 0, withdrawal_id: str = '', comment: str = ''):
+
+			try:
+
+				headers = {
+					'accept': 'application/json',
+					'Rocket-Pay-Key': str(cls.api),
+					'Content-Type': 'application/json',
+				}
+
+				data = {
+					"network": "TON",
+					"address": destination_address,
+					"currency": currency,
+					"amount": amount,
+					"withdrawalId": withdrawal_id,
+					"comment": comment
+				}
+
+				url = 'https://pay.ton-rocket.com/app/withdrawal'
+				resp = await Rest.post(url=url, headers=headers, json=data)
+
+				return resp.json
+
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'tonrocket error'
+
+
+
+
+
+		# Invoice methods
 		@classmethod
 		async def CreateInvoice(cls, amount: float = 0, minPayment: float = 0, numPayments: int = 0, currency: str = '', description: str = '', hiddenMessage: str = '', commentsEnabled: bool = False, callbackUrl: str = '', payload: str = '', expiredIn: int = 0):
 
@@ -335,7 +665,7 @@ class Payments():
 				}
 
 				url = 'https://pay.ton-rocket.com/tg-invoices'
-				resp = await Rest.post(url=url, headers=headers, data=data)
+				resp = await Rest.post(url=url, headers=headers, json=data)
 
 				return resp.json
 
@@ -372,7 +702,7 @@ class Payments():
 				}
 
 				url = 'https://pay.ton-rocket.com/multi-cheques'
-				resp = await Rest.post(url=url, headers=headers, data=data)
+				resp = await Rest.post(url=url, headers=headers, json=data)
 
 				return resp.json
 
