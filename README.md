@@ -10,12 +10,7 @@ pip install git+https://github.com/BEWARETHEDEAD/ATools.git
 
 # ⏳ Soon
 - Payment Systems:
-    - CryptoBot
     - Wallet Pay
-      
-- Data:
-    - Wrapping JSON-answer data to a **Namespace** object
-
 
 
 # 🧭 Navigation
@@ -39,6 +34,11 @@ pip install git+https://github.com/BEWARETHEDEAD/ATools.git
         - [TonRocket About](#tonrocket-about)
         - [TonRocket Invoices](#tonrocket-invoices)
         - [TonRocket Cheques](#tonrocket-cheques)
+     
+    - [🔵 CryptoBot](#cryptobot)
+        - [CryptoBot About](#cryptobot-about)
+        - [CryptoBot Invoices](#cryptobot-invoices)
+        - [CryptoBot Exchange](#cryptobot-exchange)
      
 ## 🔗 Rest Requests
 ```python
@@ -145,14 +145,10 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       import ATools
 
       
-      ATools.Payments.xJet(
+      xJet = ATools.Payments.xJet(
           api_key: str,
           private_key: str
       )
-      
-      
-      xJet = ATools.Payments.xJet
-      
       
       # Backend Methods
       longpool = await xJet.LongPool()
@@ -174,13 +170,10 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       import ATools
 
       
-      ATools.Payments.xJet(
+      xJet = ATools.Payments.xJet(
           api_key: str,
           private_key: str
       )
-      
-      
-      xJet = ATools.Payments.xJet
 
       # Invoices
       invoice = await xJet.CreateInvoice(currency: str, amount: float, description: str, max_payments: int)
@@ -193,14 +186,11 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       import ATools
 
       
-      ATools.Payments.xJet(
+      xJet = ATools.Payments.xJet(
           api_key: str,
           private_key: str
       )
       
-      
-      xJet = ATools.Payments.xJet
-
       # Cheques
       cheque = await xJet.CreateCheque(currency: str, amount: int, expires: int, description: str, activates_count: int, groups_id: int, personal_id: int, password: str)
       cheque_status = await xJet.ChequeStatus(cheque_id: str)
@@ -214,13 +204,10 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       import ATools
 
       
-      ATools.Payments.xJet(
+      xJet = ATools.Payments.xJet(
           api_key: str,
           private_key: str
       )
-      
-      
-      xJet = ATools.Payments.xJet
 
       # NFT methods
       nft_list = await xJet.NftList()
@@ -233,13 +220,10 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       import ATools
 
       
-      ATools.Payments.xJet(
+      xJet = ATools.Payments.xJet(
           api_key: str,
           private_key: str
       )
-      
-      
-      xJet = ATools.Payments.xJet
 
       # Exchange methods
       exchange_pairs = await xJet.ExchangePairs()
@@ -253,14 +237,14 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       ```python
       import ATools
 
-      ATools.Payments.TonRocket.api = ''
-      
-      TR = ATools.Payments.TonRocket
-      
+      TR = ATools.Payments.TonRocket(
+          api_key: str
+      )
+
       # About
-      info = await ATools.TR.Info()
-      transfer = await ATools.TR.Transfer(user_id: int, currency: str, amount: float, transfer_id: str, description: str)
-      withdrawal = await ATools.TR.Withdrawal(destination_address: str, currency: str, amount: float, withdrawal_id: str, comment: str)
+      info = await TR.Info()
+      transfer = await TR.Transfer(user_id: int, currency: str, amount: float, transfer_id: str, description: str)
+      withdrawal = await TR.Withdrawal(destination_address: str, currency: str, amount: float, withdrawal_id: str, comment: str)
 
       ```
       
@@ -268,12 +252,23 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       ```python
       import ATools
 
-      ATools.Payments.TonRocket.api = ''
-      
-      TR = ATools.Payments.TonRocket
+      TR = ATools.Payments.TonRocket(
+          api_key: str
+      )
       
       # Invoice methods
-      invoice = await ATools.TR.CreateInvoice(amount: float, minPayment: float, numPayments: int, currency: str, description: str, hiddenMessage: str, commentsEnabled: bool, callbackUrl: str, payload: str, expiredIn: int)
+      invoice = await TR.CreateInvoice(
+          amount: float, 
+          minPayment: float, 
+          numPayments: int, 
+          currency: str, 
+          description: str, 
+          hiddenMessage: str, 
+          commentsEnabled: bool, 
+          callbackUrl: str, 
+          payload: str, 
+          expiredIn: int
+      )
 
       ```
 
@@ -281,10 +276,94 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       ```python
       import ATools
 
-      ATools.Payments.TonRocket.api = ''
-      
-      TR = ATools.Payments.TonRocket
+      TR = ATools.Payments.TonRocket(
+          api_key: str
+      )
       
       # Cheque methods
-      cheque = await ATools.TR.CreateCheque(currency: str, chequePerUser: float, usersNumber: int, refProgram: int, password: str, description: str, sendNotification: bool, enableCaptcha: bool, telegramResourcesIds: list, forPremium: bool, linkedWallet: bool, disabledLanguages: list)
+      cheque = await TR.CreateCheque(
+          currency: str, 
+          chequePerUser: float, 
+          usersNumber: int, 
+          refProgram: int, 
+          password: str, 
+          description: str, 
+          sendNotification: bool, 
+          enableCaptcha: bool, 
+          telegramResourcesIds: list, 
+          forPremium: bool, 
+          linkedWallet: bool, 
+          disabledLanguages: list
+      )
+      ```
+      
+- ## 🔵 CryptoBot
+  - ### CryptoBot About
+      ```python
+      import ATools
+
+      CB = ATools.Payments.CryptoBot(
+          api_key: str
+      )
+
+      # About
+      me = await CB.Me()
+      balance = await CB.Balance()
+      transfer = await CB.Transfer(user_id: int, currency: str, amount: float, spend_id: str, comment: str, disable_send_notification: bool)
+      ```
+      
+  - ### Cryptobot Invoices
+      ```python
+      import ATools
+
+      CB = ATools.Payments.Cryptobot(
+          api_key: str
+      )
+
+      invoice = await CB.CreateInvoice(
+          currency: str, 
+          amount: float, 
+          description: str, 
+          hidden_message: str, 
+          paid_btn_name: str, 
+          paid_btn_url: str, 
+          payload: str, 
+          allow_comments: bool, 
+          allow_anonymous: bool, 
+          expires_in: int
+      )
+      invoice_status = await CB.InvoiceStatus(currency: str, invoice_ids: str, status: str, offset: int, count: int)
+      ```
+
+  - ### Cryptobot Exchange
+      ```python
+      import ATools
+
+      CB = ATools.Payments.Cryptobot(
+          api_key: str
+      )
+
+      exchange_rates = await CB.ExchangeRates()
+      exchange_currencies = await CB.ExchangeCurrencies(
+          invoice_id: int, 
+          status: str, 
+          hash: str, 
+          currency: str, 
+          amount: float, 
+          fee: str, 
+          pay_url: str, 
+          description: str, 
+          created_at: str, 
+          usd_rate: str, 
+          allow_comments: bool, 
+          allow_anonymous: bool, 
+          expiration_date: str, 
+          paid_at: str, 
+          paid_anonymously: bool, 
+          comment: str, 
+          hidden_message: str, 
+          payload: str, 
+          paid_btn_name: str, 
+          paid_btn_url: str
+      )
       ```
