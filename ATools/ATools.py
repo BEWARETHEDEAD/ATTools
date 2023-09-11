@@ -33,12 +33,34 @@ import functools #pip install functools
 
 
 
+
+# Wraper in Namespace for Payments() child methods
+def wrap_result_in_namespace(func):
+	async def wrapper(*args, **kwargs):
+		result = await func(*args, **kwargs)
+		
+		def convert_to_namespace(data):
+			if isinstance(data, dict):
+				return Namespace(**{key: convert_to_namespace(value) for key, value in data.items()})
+			elif isinstance(data, list):
+				return [convert_to_namespace(item) for item in data]
+			else:
+				return data
+		
+		return convert_to_namespace(result)
+	
+	return wrapper  
+
+
+
+
+
 # Respone DataType
 class Response(Namespace):
 	async def update(self):
 		
 		path = getattr(Rest, self.type)
-		return await path(url=self.url, headers=self.headers, data=self.data)
+		return await path(url=self.url, headers=self.headers, data=self.data, json=self.json_data)
 
 
 # Rest requests
@@ -224,7 +246,7 @@ class Analyze():
 		return (jetton_liquidity) / lp_total_supply
 
 
-	async def GetJettonwalletOwner(jettonwallet_address):
+	async def GetJettonwalletOwner(jettonwallet_address: str):
 
 		return await Rest.get(url=f'https://api.ton.cat/v2/contracts/jetton_wallet/{jettonwallet_address}')
 
@@ -241,7 +263,7 @@ class Wallet_DT(Namespace):
 # Wallet decorator
 class Wallets():
 
-	async def init(api_key, mnemonics):
+	async def init(toncenter_api_key: str, mnemonics: str):
 
 		client = TonCenterClient(api_key)
 		wallet = Wallet(provider=client, mnemonics=mnemonics, version='v4r2')
@@ -284,7 +306,7 @@ class WalletManager():
 # Payment systems
 class Payments():
 
-	
+
 	class xJet():
 
 		def __init__(self, api_key, private_key, network='mainnet'):
@@ -298,15 +320,16 @@ class Payments():
 				network=self.network
 			)
 
+			{setattr(Payments.xJet, name, wrap_result_in_namespace(method)) for name, method in vars(Payments.xJet).items() if callable(method) and name != '__init__'}
 
 
 		# Backend Methods
-		@classmethod
-		async def LongPool(cls):
+		
+		async def LongPool(self):
 			try:
 
 				headers = {
-					'X-API-Key': cls.api.api_key
+					'X-API-Key': self.api.api_key
 				}
 
 				response = await Rest.get(url='http://xjet.app/api/v1/account.events', headers=headers)
@@ -322,48 +345,48 @@ class Payments():
 
 
 		# About
-		@classmethod
-		async def Currencies(cls):
+		
+		async def Currencies(self):
 
 			return await xjet.currencies()
 
 
-		@classmethod
-		async def Me(cls):
+		#
+		async def Me(self):
 
-			return await cls.api.me()
-
-
-		@classmethod
-		async def Balance(cls):
-
-			return await cls.api.balance()
+			return await self.api.me()
 
 
-		@classmethod
-		async def SubmitDeposit(cls):
+		
+		async def Balance(self):
 
-			return await cls.api.submit_deposit()
+			return await self.api.balance()
 
 
-		@classmethod
-		async def Withdraw(cls, address: str = '', currency: str = '', amount: float = 0):
+		
+		async def SubmitDeposit(self):
+
+			return await self.api.submit_deposit()
+
+
+		
+		async def Withdraw(self, address: str = '', currency: str = '', amount: float = 0):
 
 			try:
 
-				return await cls.api.withdraw(address, currency, amount)
+				return await self.api.withdraw(address, currency, amount)
 
 			except Exception as e:
 				return 'xjet error'
 				traceback.print_exc()
 
 
-		@classmethod
-		async def Operations(cls, limit: int = 0, offset: int = 0):
+		
+		async def Operations(self, limit: int = 0, offset: int = 0):
 
 			try:
 
-				return await cls.api.operations(limit, offset)
+				return await self.api.operations(limit, offset)
 
 			except Exception as e:
 				return 'xjet error'
@@ -374,36 +397,36 @@ class Payments():
 
 
 		# Invoices
-		@classmethod
-		async def CreateInvoice(cls, currency: str = '', amount: float = 0, description: str = '', max_payments: int = 1):
+		
+		async def CreateInvoice(self, currency: str = '', amount: float = 0, description: str = '', max_payments: int = 1):
 
 			try:
 
-				return await cls.api.invoice_create(currency, amount, description, max_payments)
+				return await self.api.invoice_create(currency, amount, description, max_payments)
 
 			except Exception as e:
 				traceback.print_exc()
 				return 'xjet error'
 
 
-		@classmethod
-		async def InvoiceStatus(cls, invoice_id: str = ''):
+		
+		async def InvoiceStatus(self, invoice_id: str = ''):
 
 			try:
 
-				return await cls.api.invoice_status(invoice_id)
+				return await self.api.invoice_status(invoice_id)
 
 			except Exception as e:
 				traceback.print_exc()
 				return 'xjet error'
 
 
-		@classmethod
-		async def InvoiceList(cls):
+		
+		async def InvoiceList(self):
 
 			try:
 
-				return await cls.api.invoice_list()
+				return await self.api.invoice_list()
 
 			except Exception as e:
 				traceback.print_exc()
@@ -414,48 +437,48 @@ class Payments():
 
 
 		# Cheques
-		@classmethod
-		async def CreateCheque(cls, currency: str = '', amount: int = 0, expires: int = 0, description: str = '', activates_count: int = 0, groups_id: int = None, personal_id:int = 0, password: str = None):
+		
+		async def CreateCheque(self, currency: str = '', amount: int = 0, expires: int = 0, description: str = '', activates_count: int = 0, groups_id: int = None, personal_id:int = 0, password: str = None):
 
 			try:
 
-				return await cls.api.cheque_create(currency, amount, expires, description, activates_count, groups_id, personal_id, password) # create cheque
+				return await self.api.cheque_create(currency, amount, expires, description, activates_count, groups_id, personal_id, password) # create cheque
 
 			except Exception as e:
 				traceback.print_exc()
 				return 'xjet error'
 
 
-		@classmethod
-		async def ChequeStatus(cls, cheque_id: str = ''):
+		
+		async def ChequeStatus(self, cheque_id: str = ''):
 
 			try:
 
-				return await cls.api.cheque_status(cheque_id)
+				return await self.api.cheque_status(cheque_id)
 
 			except Exception as e:
 				traceback.print_exc()
 				return 'xjet error'
 
 
-		@classmethod
-		async def ChequeList(cls):
+		
+		async def ChequeList(self):
 
 			try:
 
-				return await cls.api.cheque_list() 
+				return await self.api.cheque_list() 
 
 			except Exception as e:
 				traceback.print_exc()
 				return 'xjet error'
 
 
-		@classmethod
-		async def ChequeCancel(cls, cheque_id: str = ''):
+		
+		async def ChequeCancel(self, cheque_id: str = ''):
 
 			try:
 
-				return await cls.api.cheque_cancel(cheque_id)
+				return await self.api.cheque_cancel(cheque_id)
 
 			except Exception as e:
 				traceback.print_exc()
@@ -466,24 +489,24 @@ class Payments():
 
 
 		# NFT methods
-		@classmethod
-		async def NftList(cls):
+		
+		async def NftList(self):
 
 			try:
 
-				return await cls.api.nft_list()
+				return await self.api.nft_list()
 
 			except Exception as e:
 				traceback.print_exc()
 				return 'xjet error'
 
 
-		@classmethod
-		async def NftTransfer(cls, nft_address: str = '', destination_address: str = ''):
+		
+		async def NftTransfer(self, nft_address: str = '', destination_address: str = ''):
 
 			try:
 
-				return await cls.api.nft_transfer(nft_address, destination_address)
+				return await self.api.nft_transfer(nft_address, destination_address)
 
 			except Exception as e:
 				traceback.print_exc()
@@ -493,48 +516,48 @@ class Payments():
 
 
 		# Exchange methods
-		@classmethod
-		async def ExchangePairs(cls):
+		
+		async def ExchangePairs(self):
 
 			try:
 
-				return await cls.api.exchange_pairs()
+				return await self.api.exchange_pairs()
 
 			except Exception as e:
 				traceback.print_exc()
 				return 'xjet error'
 
 
-		@classmethod
-		async def ExchangeEstimate(cls, tokens: list = ['left', 'right'], type: str = '', amount: int = 0):
+		
+		async def ExchangeEstimate(self, tokens: list = ['left', 'right'], type: str = '', amount: int = 0):
 
 			try:
 
-				return await cls.api.exchange_estimate(tokens, type, amount)
+				return await self.api.exchange_estimate(tokens, type, amount)
 
 			except Exception as e:
 				traceback.print_exc()
 				return 'xjet error'
 
 
-		@classmethod
-		async def ExchangeCreateOrder(cls, tokens: list = ['left', 'right'], type: str = '', amount: int = 0, min_receive_amount: int = 0):
+		
+		async def ExchangeCreateOrder(self, tokens: list = ['left', 'right'], type: str = '', amount: int = 0, min_receive_amount: int = 0):
 
 			try:
 
-				return await cls.api.exchange_create_order(tokens, type, amount, min_receive_amount)
+				return await self.api.exchange_create_order(tokens, type, amount, min_receive_amount)
 
 			except Exception as e:
 				traceback.print_exc()
 				return 'xjet error'
 
 
-		@classmethod
-		async def ExchangeOrderStatus(cls, order_id: str = ''):
+		
+		async def ExchangeOrderStatus(self, order_id: str = ''):
 
 			try:
 
-				return await cls.api.exchange_order_status(order_id)
+				return await self.api.exchange_order_status(order_id)
 
 			except Exception as e:
 				traceback.print_exc()
@@ -545,18 +568,21 @@ class Payments():
 	
 	class TonRocket():
 
-		api = None
+		def __init__(self, api_key):
+			self.api = api_key
+
+			{setattr(Payments.TonRocket, name, wrap_result_in_namespace(method)) for name, method in vars(Payments.TonRocket).items() if callable(method) and name != '__init__'}
 
 
 		# About
-		@classmethod
-		async def Info(cls):
+		
+		async def Info(self):
 
 			try:
 
 				headers = {
 					'accept': 'application/json',
-					'Rocket-Pay-Key': str(cls.api),
+					'Rocket-Pay-Key': str(self.api),
 					'Content-Type': 'application/json',
 				}
 
@@ -575,14 +601,14 @@ class Payments():
 
 
 		# App methods
-		@classmethod
-		async def Transfer(cls, user_id: int = 0, currency: str = '', amount: float = 0, transfer_id: str = '', description: str = ''):
+		
+		async def Transfer(self, user_id: int = 0, currency: str = '', amount: float = 0, transfer_id: str = '', description: str = ''):
 
 			try:
 
 				headers = {
 					'accept': 'application/json',
-					'Rocket-Pay-Key': str(cls.api),
+					'Rocket-Pay-Key': str(self.api),
 					'Content-Type': 'application/json',
 				}
 
@@ -605,14 +631,14 @@ class Payments():
 				return 'tonrocket error'
 
 
-		@classmethod
-		async def Withdrawal(cls, destination_address: str = '', currency: str = '', amount: float = 0, withdrawal_id: str = '', comment: str = ''):
+		
+		async def Withdrawal(self, destination_address: str = '', currency: str = '', amount: float = 0, withdrawal_id: str = '', comment: str = ''):
 
 			try:
 
 				headers = {
 					'accept': 'application/json',
-					'Rocket-Pay-Key': str(cls.api),
+					'Rocket-Pay-Key': str(self.api),
 					'Content-Type': 'application/json',
 				}
 
@@ -640,14 +666,14 @@ class Payments():
 
 
 		# Invoice methods
-		@classmethod
-		async def CreateInvoice(cls, amount: float = 0, minPayment: float = 0, numPayments: int = 0, currency: str = '', description: str = '', hiddenMessage: str = '', commentsEnabled: bool = False, callbackUrl: str = '', payload: str = '', expiredIn: int = 0):
+		
+		async def CreateInvoice(self, amount: float = 0, minPayment: float = 0, numPayments: int = 0, currency: str = '', description: str = '', hiddenMessage: str = '', commentsEnabled: bool = False, callbackUrl: str = '', payload: str = '', expiredIn: int = 0):
 
 			try:
 
 				headers = {
 					'accept': 'application/json',
-					'Rocket-Pay-Key': str(cls.api),
+					'Rocket-Pay-Key': str(self.api),
 					'Content-Type': 'application/json',
 				}
 
@@ -675,14 +701,17 @@ class Payments():
 				return 'tonrocket error'
 
 
-		@classmethod
-		async def CreateCheque(cls, currency: str = '', chequePerUser: float = 0, usersNumber: int = 0, refProgram: int = 0, password: str = '', description: str = '', sendNotification: bool = True, enableCaptcha: bool = False, telegramResourcesIds: list = [], forPremium: bool = False, linkedWallet: bool = False, disabledLanguages: list = []):
+
+
+		# Cheque methods
+		
+		async def CreateCheque(self, currency: str = '', chequePerUser: float = 0, usersNumber: int = 0, refProgram: int = 0, password: str = '', description: str = '', sendNotification: bool = True, enableCaptcha: bool = False, telegramResourcesIds: list = [], forPremium: bool = False, linkedWallet: bool = False, disabledLanguages: list = []):
 
 			try:
 
 				headers = {
 					'accept': 'application/json',
-					'Rocket-Pay-Key': str(cls.api),
+					'Rocket-Pay-Key': str(self.api),
 					'Content-Type': 'application/json',
 				}
 
@@ -710,3 +739,217 @@ class Payments():
 			except Exception as e:
 				traceback.print_exc()
 				return 'tonrocket error'
+
+
+	class CryptoBot():
+
+		def __init__(self, api_key):
+			self.api = api_key
+
+			{setattr(Payments.CryptoBot, name, wrap_result_in_namespace(method)) for name, method in vars(Payments.CryptoBot).items() if callable(method) and name != '__init__'}
+
+
+		# About
+		async def Me(self):
+
+			try:
+
+				headers = {
+					'accept': 'application/json',
+					'Crypto-Pay-API-Token': str(self.api),
+					'Content-Type': 'application/json',
+				}
+
+				url = 'https://pay.crypt.bot/api/getMe'
+				resp = await Rest.get(url=url, headers=headers)
+
+				return resp.json
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'cryptobot error'
+
+
+		async def Balance(self):
+
+			try:
+
+				headers = {
+					'accept': 'application/json',
+					'Crypto-Pay-API-Token': str(self.api),
+					'Content-Type': 'application/json',
+				}
+
+				url = 'https://pay.crypt.bot/api/getBalance'
+				resp = await Rest.get(url=url, headers=headers)
+
+				return resp.json
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'cryptobot error'
+
+
+
+
+
+		# Invoice methods
+		async def CreateInvoice(self, currency: str = '', amount: float = 0, description: str = '', hidden_message: str = '', paid_btn_name: str = '', paid_btn_url: str = '', payload: str = '', allow_comments: bool = False, allow_anonymous: bool = False, expires_in: int = 0):
+
+			try:
+
+				headers = {
+					'accept': 'application/json',
+					'Crypto-Pay-API-Token': str(self.api),
+					'Content-Type': 'application/json',
+				}
+
+				data = {
+					"asset": currency,
+					"amount": str(amount),
+					"description": description,
+					"hidden_message": hidden_message,
+					"paid_btn_name": paid_btn_name,
+					"paid_btn_url": paid_btn_url,
+					"payload": payload,
+					"allow_comments": allow_comments,
+					"allow_anonymous": allow_anonymous,
+					"expires_in": expires_in
+				}
+
+				url = 'https://pay.crypt.bot/api/createInvoice'
+				resp = await Rest.post(url=url, headers=headers, json=data)
+
+				return resp.json
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'cryptobot error'
+
+
+		async def InvoiceStatus(self, currency: str = '', invoice_ids: str = '', status: str = '', offset: int = 0, count: int = 0):
+
+			try:
+
+				headers = {
+					'accept': 'application/json',
+					'Crypto-Pay-API-Token': str(self.api),
+					'Content-Type': 'application/json',
+				}
+
+				data = {
+					"asset": currency,
+					"invoice_ids": invoice_ids,
+					"status": status,
+					"offset": offset,
+					"count": count
+				}
+
+				url = 'https://pay.crypt.bot/api/getInvoices'
+				resp = await Rest.post(url=url, headers=headers, json=data)
+
+				return resp.json
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'cryptobot error'
+
+
+
+
+
+		# Transfer methods
+		async def Transfer(self, user_id: int = 0, currency: str = '', amount: float = 0, spend_id: str = '', comment: str = '', disable_send_notification: bool = False):
+
+			try:
+
+				headers = {
+					'accept': 'application/json',
+					'Crypto-Pay-API-Token': str(self.api),
+					'Content-Type': 'application/json',
+				}
+
+				data = {
+					"user_id": user_id,
+					"asset": currency,
+					"amount": str(amount),
+					"spend_id": spend_id,
+					"comment": comment,
+					"disable_send_notification": disable_send_notification
+				}
+
+
+				url = 'https://pay.crypt.bot/api/transfer'
+				resp = await Rest.post(url=url, headers=headers, json=data)
+
+				return resp.json
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'cryptobot error'
+
+
+
+
+		# Exchange methods
+		async def ExchangeRates(self):
+
+			try:
+
+				headers = {
+					'accept': 'application/json',
+					'Crypto-Pay-API-Token': str(self.api),
+					'Content-Type': 'application/json',
+				}
+
+				url = 'https://pay.crypt.bot/api/getExchangeRates'
+				resp = await Rest.get(url=url, headers=headers)
+
+				return resp.json
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'cryptobot error'
+
+
+		async def ExchangeRates(self, invoice_id: int = 0, status: str = '', hash: str = '', currency: str = '', amount: float = 0, fee: str = '', pay_url: str = '', description: str = '', created_at: str = '', usd_rate: str = '', allow_comments: bool = False, allow_anonymous: bool = False, expiration_date: str = '', paid_at: str = '', paid_anonymously: bool = False, comment: str = '', hidden_message: str = '', payload: str = '', paid_btn_name: str = '', paid_btn_url: str = ''):
+
+			try:
+
+				headers = {
+					'accept': 'application/json',
+					'Crypto-Pay-API-Token': str(self.api),
+					'Content-Type': 'application/json',
+				}
+
+				data = {
+					"invoice_id": invoice_id,
+					"status": status,
+					"hash": hash,
+					"asset": currency,
+					"amount": str(amount),
+					"fee": fee,
+					"pay_url": pay_url,
+					"description": description,
+					"created_at": created_at,
+					"usd_rate": usd_rate,
+					"allow_comments": allow_comments,
+					"allow_anonymous": allow_anonymous,
+					"expiration_date": expiration_date,
+					"paid_at": paid_at,
+					"paid_anonymously": paid_anonymously,
+					"comment": comment,
+					"hidden_message": hidden_message,
+					"payload": payload,
+					"paid_btn_name": paid_btn_name,
+					"paid_btn_url": paid_btn_url
+				}
+
+				url = 'https://pay.crypt.bot/api/getCurrencies'
+				resp = await Rest.get(url=url, headers=headers)
+
+				return resp.json
+
+			except Exception as e:
+				traceback.print_exc()
+				return 'cryptobot error'
