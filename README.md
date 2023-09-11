@@ -176,7 +176,12 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       )
 
       # Invoices
-      invoice = await xJet.CreateInvoice(currency: str, amount: float, description: str, max_payments: int)
+      invoice = await xJet.CreateInvoice(
+          currency: str, 
+          amount: float, 
+          description: str, 
+          max_payments: int
+      )
       invoice_status = await xJet.InvoiceStatus(invoice_id: str)
       invoice_list = await xJet.InvoiceList()
       ```
@@ -192,7 +197,16 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       )
       
       # Cheques
-      cheque = await xJet.CreateCheque(currency: str, amount: int, expires: int, description: str, activates_count: int, groups_id: int, personal_id: int, password: str)
+      cheque = await xJet.CreateCheque(
+          currency: str, 
+          amount: int, 
+          expires: int, 
+          description: str, 
+          activates_count: int, 
+          groups_id: int, 
+          personal_id: int, 
+          password: str
+      )
       cheque_status = await xJet.ChequeStatus(cheque_id: str)
       cheque_list = await xJet.ChequeList()
       cheque_cancel = await xJet.ChequeCancel(cheque_id: str)
