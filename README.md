@@ -11,6 +11,7 @@ pip install git+https://github.com/BEWARETHEDEAD/ATools.git
 # ⏳ Soon
 - Payment Systems:
     - CryptoBot
+    - Wallet Pay
       
 - Data:
     - Wrapping JSON-answer data to a **Namespace** object
