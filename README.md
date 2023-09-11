@@ -267,7 +267,13 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       # About
       info = await TR.Info()
       transfer = await TR.Transfer(user_id: int, currency: str, amount: float, transfer_id: str, description: str)
-      withdrawal = await TR.Withdrawal(destination_address: str, currency: str, amount: float, withdrawal_id: str, comment: str)
+      withdrawal = await TR.Withdrawal(
+          destination_address: str, 
+          currency: str, 
+          amount: float, 
+          withdrawal_id: str, 
+          comment: str
+      )
 
       ```
       
@@ -332,7 +338,14 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       # About
       me = await CB.Me()
       balance = await CB.Balance()
-      transfer = await CB.Transfer(user_id: int, currency: str, amount: float, spend_id: str, comment: str, disable_send_notification: bool)
+      transfer = await CB.Transfer(
+          user_id: int, 
+          currency: str, 
+          amount: float, 
+          spend_id: str, 
+          comment: str, 
+          disable_send_notification: bool
+      )
       ```
       
   - ### Cryptobot Invoices
@@ -355,7 +368,13 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
           allow_anonymous: bool, 
           expires_in: int
       )
-      invoice_status = await CB.InvoiceStatus(currency: str, invoice_ids: str, status: str, offset: int, count: int)
+      invoice_status = await CB.InvoiceStatus(
+          currency: str, 
+          invoice_ids: str, 
+          status: str, 
+          offset: int, 
+          count: int
+      )
       ```
 
   - ### Cryptobot Exchange
