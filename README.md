@@ -1,7 +1,7 @@
  # ATools
 Tools For TON
 
-cur: v.0.1.1
+cur: v.0.1.2
 
 **Installation**
 ```shell
