@@ -266,7 +266,13 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
 
       # About
       info = await TR.Info()
-      transfer = await TR.Transfer(user_id: int, currency: str, amount: float, transfer_id: str, description: str)
+      transfer = await TR.Transfer(
+          user_id: int, 
+          currency: str, 
+          amount: float, 
+          transfer_id: str, 
+          description: str
+      )
       withdrawal = await TR.Withdrawal(
           destination_address: str, 
           currency: str, 
