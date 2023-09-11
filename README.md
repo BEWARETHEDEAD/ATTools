@@ -122,8 +122,7 @@ tonconnect_obj = await ATools.WalletManager.TonConnect(url_path_to_json: str, pr
 
 # answer data
 
-connector = tonconnect_obj[0]
-connect_url = tonconnect_obj[1]
+connector, connect_url = tonconnect_obj
 
 # connected wallet address
 
