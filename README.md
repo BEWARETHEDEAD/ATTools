@@ -29,7 +29,7 @@ pip install ATTools
 
 
 # 🧭 Navigation
-- [🔗 Rest Requests](#%F0%9F%94%97-rest-requests)
+- [🔗 Rest Requests](#-rest-requests)
 -
 - [🌕 Jettons](#jettons)
     - [Jetton Analyze](#jetton-analyze)
