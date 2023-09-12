@@ -56,6 +56,7 @@ pip install ATTools
         - [CryptoBot Exchange](#cryptobot-exchange)
      
 - [🖼 NFT](#nft)
+  - [NFT Methods](#nft-methods)
 
 ## 🔗 Rest Requests
 ```python
@@ -433,7 +434,8 @@ wallet_balance = await ATTools.WalletManager.GetBalanceByWallet(address: str)
       )
       ```
 
-## 🖼 NFT
+# 🖼 NFT
+- ## NFT Methods
 ```python
 import ATTools
 
