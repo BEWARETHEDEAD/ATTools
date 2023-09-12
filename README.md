@@ -31,7 +31,7 @@ pip install ATTools
 # 🧭 Navigation
 - [🔗 Rest Requests](#rest-requests)
 -
-- [🌕 Jettons](#jettons)
+- [🌕 Jettons](#🌕-jettons)
     - [Jetton Analyze](#jetton-analyze)
 -     
 - [👛 Wallet](#wallet)
@@ -56,7 +56,6 @@ pip install ATTools
         - [CryptoBot Exchange](#cryptobot-exchange)
      
 - [🖼 NFT](#nft)
-  - [NFT Methods](#nft-methods)
 
 ## 🔗 Rest Requests
 ```python
@@ -77,7 +76,7 @@ text_answer = response.text
 response = await response.update()
 ```
 
-##  Jettons
+## 🌕 Jettons
 ```python
 import ATTools
 
@@ -435,12 +434,11 @@ wallet_balance = await ATTools.WalletManager.GetBalanceByWallet(address: str)
       ```
 
 # 🖼 NFT
-- ## NFT Methods
-  ```python
-  import ATTools
-  
-  
-  nfts_on_wallet = await ATTools.NFT.GetNFTOnWallet(address: str)
-  nfts_info = await ATTools.NFT.GetNFTInfo(address: str)
-  collection_info = await ATTools.NFT.GetNFTCollectionInfo(address: str)
-  ```
+```python
+import ATTools
+
+
+nfts_on_wallet = await ATTools.NFT.GetNFTOnWallet(address: str)
+nfts_info = await ATTools.NFT.GetNFTInfo(address: str)
+collection_info = await ATTools.NFT.GetNFTCollectionInfo(address: str)
+```
