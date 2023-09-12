@@ -57,7 +57,8 @@ pip install ATTools
      
 - [🖼 NFT](#nft)
 
-## 🔗 Rest Requests <!-- anchor: rest-requests -->
+## 🔗 Rest Requests
+## Rest Requests <!-- anchor: rest-requests -->
 ```python
 import ATTools
 
