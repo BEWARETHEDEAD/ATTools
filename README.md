@@ -31,31 +31,31 @@ pip install ATTools
 # 🧭 Navigation
 - [🔗 Rest Requests](#-rest-requests)
 -
-- [🌕 Jettons](#jettons)
+- [🌕 Jettons](#-jettons)
     - [Jetton Analyze](#jetton-analyze)
 -     
-- [👛 Wallet](#wallet)
+- [👛 Wallet](#-wallet)
     - [Wallet Manager](#wallet-manager)
 -
-- [🏦 Payment Systems](#payment-systems)
-    - [🟥 xJetSwap](#xjetswap)
+- [🏦 Payment Systems](#-payment-systems)
+    - [🟥 xJetSwap](#-xjetswap)
         - [xJet About](#xjet-about)
         - [xJet Invoices](#xjet-invoices)
         - [xJet Cheques](#xjet-cheques)
         - [xJet NFT](#xjet-nft)
         - [xJet Exchange](#xjet-exchange)
 
-    - [🟦 TonRocket](#tonrocket)
+    - [🟦 TonRocket](#-tonrocket)
         - [TonRocket About](#tonrocket-about)
         - [TonRocket Invoices](#tonrocket-invoices)
         - [TonRocket Cheques](#tonrocket-cheques)
      
-    - [🔵 CryptoBot](#cryptobot)
+    - [🔵 CryptoBot](#-cryptobot)
         - [CryptoBot About](#cryptobot-about)
         - [CryptoBot Invoices](#cryptobot-invoices)
         - [CryptoBot Exchange](#cryptobot-exchange)
      
-- [🖼 NFT](#nft)
+- [🖼 NFT](#-nft)
 
 ## 🔗 Rest Requests
 ```python
