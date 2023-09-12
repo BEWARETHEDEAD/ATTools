@@ -1,7 +1,7 @@
  # ATTools
 Analyticks Ton Tools
 
-cur: v.0.1.6
+cur: v.0.1.7
 
 **Installation**
 ```shell
