@@ -5,7 +5,7 @@ cur: v.0.1.2
 
 **Installation**
 ```shell
-pip install git+https://github.com/BEWARETHEDEAD/ATools.git
+pip install git+https://github.com/BEWARETHEDEAD/ATTools.git
 ```
 
 # ⏳ Soon
