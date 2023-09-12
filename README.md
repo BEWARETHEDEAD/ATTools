@@ -15,6 +15,7 @@ pip install ATTools
 # ⏳ Soon
 - Payment Systems:
     - Wallet Pay
+    - integration by injection (?)
  
 - Wallet:
     - transfers
