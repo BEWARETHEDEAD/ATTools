@@ -20,6 +20,7 @@ pip install ATTools
 - Wallet:
     - transfers
     - NFT transfers
+    - viewing NFT on a wallet
  
 - TonConnect:
     - update the proof algorithm
@@ -28,6 +29,7 @@ pip install ATTools
     - viewing NFT on a wallet
     - viewing information about NFT
     - viewing information about the NFT collection
+    - NFT transfers
 
 
 # 🧭 Navigation
