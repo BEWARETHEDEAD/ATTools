@@ -279,9 +279,9 @@ class Wallets():
 # Wallet manage
 class WalletManager():
 
-	async def TonConnect(url_path_to_json: str, provider: str, payload: str): # by davlgames
+	async def TonConnect(url_path_to_json: str, provider: str, payload: str, use_tonapi: bool, tonapi_token: str): # by davlgames
 
-		connector = AsyncConnector(url_path_to_json)
+		connector = AsyncConnector(url_path_to_json, use_tonapi, tonapi_token)
 		connect_url = await connector.connect(provider, payload)
 
 		return connector, connect_url
