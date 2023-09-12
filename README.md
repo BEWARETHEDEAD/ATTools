@@ -31,6 +31,9 @@ pip install ATTools
     - viewing information about the NFT collection
     - NFT transfers
 
+- Data Providers (new block)
+    - choise data-provider
+
 
 # 🧭 Navigation
 - [🔗 Rest Requests](#rest-requests)
