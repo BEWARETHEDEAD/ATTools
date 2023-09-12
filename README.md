@@ -1,4 +1,4 @@
- # ATools
+ # ATTools
 Tools For TON
 
 cur: v.0.1.2
@@ -46,11 +46,11 @@ pip install git+https://github.com/BEWARETHEDEAD/ATTools.git
      
 ## 🔗 Rest Requests
 ```python
-import ATools
+import ATTools
 
-response = await ATools.Rest.get(url: str, headers: dict, data: dict, json: dict) 
+response = await ATTools.Rest.get(url: str, headers: dict, data: dict, json: dict) 
 # or
-response = await ATools.Rest.post(url: str, headers: dict, data: dict, json: dict)
+response = await ATTools.Rest.post(url: str, headers: dict, data: dict, json: dict)
 
 # answer data
 
@@ -65,9 +65,9 @@ response = await response.update()
 
 ## 🌕 Jettons
 ```python
-import ATools
+import ATTools
 
-jetton = await ATools.Jettons.get(contract: str)
+jetton = await ATTools.Jettons.get(contract: str)
 
 # answer data
 
@@ -87,28 +87,28 @@ jetton = await jetton.update()
 
 ## Jetton Analyze
 ```python
-import ATools
+import ATTools
 
 
-jetton_full_info = await ATools.Analyze.GetJettonFullInfo(token_name: str)
-jetton_pair = await ATools.Analyze.GetJettonPair(token_name: str)
-jetton_info = await ATools.Analyze.GetJettonInfo(contract: str)
-jetton_price = await ATools.Analyze.GetJettonPrice(contract: str)
-jetton_liquidity = await ATools.Analyze.GetJettonLiquidity(token_name: str)
-jetton_graph_data = await ATools.Analyze.GetJettonGraphData(token_name: str)
-jetton_providers = await ATools.Analyze.GetJettonProviders(lp_contract: str)
-jetton_holders = await ATools.Analyze.GetHoldersByContract(contract: str, limit: int)
-jetton_lp_price = await ATools.Analyze.GetLpPrice(contract: str)
+jetton_full_info = await ATTools.Analyze.GetJettonFullInfo(token_name: str)
+jetton_pair = await ATTools.Analyze.GetJettonPair(token_name: str)
+jetton_info = await ATTools.Analyze.GetJettonInfo(contract: str)
+jetton_price = await ATTools.Analyze.GetJettonPrice(contract: str)
+jetton_liquidity = await ATTools.Analyze.GetJettonLiquidity(token_name: str)
+jetton_graph_data = await ATTools.Analyze.GetJettonGraphData(token_name: str)
+jetton_providers = await ATTools.Analyze.GetJettonProviders(lp_contract: str)
+jetton_holders = await ATTools.Analyze.GetHoldersByContract(contract: str, limit: int)
+jetton_lp_price = await ATTools.Analyze.GetLpPrice(contract: str)
 
-jettonwallet_owner = await ATools.Analyze.GetJettonwalletOwner(jettonwallet_address: str)
+jettonwallet_owner = await ATTools.Analyze.GetJettonwalletOwner(jettonwallet_address: str)
 ```
 
 ## 👛 Wallet
 ```python
-import ATools
+import ATTools
 
 
-wallet = await ATools.Wallets(toncenter_api_key: str, mnemonics: str)
+wallet = await ATTools.Wallets(toncenter_api_key: str, mnemonics: str)
 
 # answer data
 
@@ -119,10 +119,10 @@ wallet_transactions = await wallet.transactions
 
 ## Wallet Manager
 ```python
-import ATools
+import ATTools
 
 
-tonconnect_obj = await ATools.WalletManager.TonConnect(url_path_to_json: str, provider: str, payload: str)
+tonconnect_obj = await ATTools.WalletManager.TonConnect(url_path_to_json: str, provider: str, payload: str)
 
 # answer data
 
@@ -134,9 +134,9 @@ address = await connector.get_address()
 
 
 
-wallet_transactions = await ATools.WalletManager.GetTransactions(address: str, limit: int, offset: int)
-wallet_info = await ATools.WalletManager.GetInfoByWallet(address: str)
-wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
+wallet_transactions = await ATTools.WalletManager.GetTransactions(address: str, limit: int, offset: int)
+wallet_info = await ATTools.WalletManager.GetInfoByWallet(address: str)
+wallet_balance = await ATTools.WalletManager.GetBalanceByWallet(address: str)
 ```
 
 
@@ -145,10 +145,10 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
 - ## 🟥 xJetSwap
     - ### xJet About
       ```python
-      import ATools
+      import ATTools
 
       
-      xJet = ATools.Payments.xJet(
+      xJet = ATTools.Payments.xJet(
           api_key: str,
           private_key: str
       )
@@ -170,10 +170,10 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       
     - ### xJet Invoices
       ```python
-      import ATools
+      import ATTools
 
       
-      xJet = ATools.Payments.xJet(
+      xJet = ATTools.Payments.xJet(
           api_key: str,
           private_key: str
       )
@@ -191,10 +191,10 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       
     - ### xJet Cheques
       ```python
-      import ATools
+      import ATTools
 
       
-      xJet = ATools.Payments.xJet(
+      xJet = ATTools.Payments.xJet(
           api_key: str,
           private_key: str
       )
@@ -218,10 +218,10 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       
     - ### xJet NFT
       ```python
-      import ATools
+      import ATTools
 
       
-      xJet = ATools.Payments.xJet(
+      xJet = ATTools.Payments.xJet(
           api_key: str,
           private_key: str
       )
@@ -234,10 +234,10 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       
     - ### xJet Exchange
       ```python
-      import ATools
+      import ATTools
 
       
-      xJet = ATools.Payments.xJet(
+      xJet = ATTools.Payments.xJet(
           api_key: str,
           private_key: str
       )
@@ -261,9 +261,9 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
 - ## 🟦 TonRocket
     - ### TonRocket About
       ```python
-      import ATools
+      import ATTools
 
-      TR = ATools.Payments.TonRocket(
+      TR = ATTools.Payments.TonRocket(
           api_key: str
       )
 
@@ -288,9 +288,9 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       
     - ### TonRocket Invoices
       ```python
-      import ATools
+      import ATTools
 
-      TR = ATools.Payments.TonRocket(
+      TR = ATTools.Payments.TonRocket(
           api_key: str
       )
       
@@ -312,9 +312,9 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
 
     - ### TonRocket Cheques
       ```python
-      import ATools
+      import ATTools
 
-      TR = ATools.Payments.TonRocket(
+      TR = ATTools.Payments.TonRocket(
           api_key: str
       )
       
@@ -338,9 +338,9 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
 - ## 🔵 CryptoBot
   - ### CryptoBot About
       ```python
-      import ATools
+      import ATTools
 
-      CB = ATools.Payments.CryptoBot(
+      CB = ATTools.Payments.CryptoBot(
           api_key: str
       )
 
@@ -359,9 +359,9 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
       
   - ### Cryptobot Invoices
       ```python
-      import ATools
+      import ATTools
 
-      CB = ATools.Payments.Cryptobot(
+      CB = ATTools.Payments.Cryptobot(
           api_key: str
       )
 
@@ -388,9 +388,9 @@ wallet_balance = await ATools.WalletManager.GetBalanceByWallet(address: str)
 
   - ### Cryptobot Exchange
       ```python
-      import ATools
+      import ATTools
 
-      CB = ATools.Payments.Cryptobot(
+      CB = ATTools.Payments.Cryptobot(
           api_key: str
       )
 
