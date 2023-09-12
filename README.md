@@ -11,6 +11,10 @@ pip install git+https://github.com/BEWARETHEDEAD/ATools.git
 # ⏳ Soon
 - Payment Systems:
     - Wallet Pay
+ 
+- Wallet
+    - transfers
+    - NFT transfers
 
 
 # 🧭 Navigation
