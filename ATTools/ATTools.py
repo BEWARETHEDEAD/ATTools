@@ -391,6 +391,17 @@ class NFT():
 		return await convert_to_namespace(resp.json)
 
 
+	async def GetCurNFTsOnWallet(address: str = '', collection_address: str = '', provider: str = None): # Provider: TonCat
+
+		headers = {
+			'Content-Type': 'application/json'
+		}
+
+		resp = await Rest.get(url=f'https://tonapi.io/v1/nft/searchItems?owner={address}&collection={collection_address}&include_on_sale=true&limit=1000&offset=0', headers=headers)
+
+		return await convert_to_namespace(resp.json)
+
+
 # Payment systems
 class Payments():
 
