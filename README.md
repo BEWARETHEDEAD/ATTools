@@ -436,11 +436,11 @@ wallet_balance = await ATTools.WalletManager.GetBalanceByWallet(address: str)
 
 # 🖼 NFT
 - ## NFT Methods
-```python
-import ATTools
-
-
-nfts_on_wallet = await ATTools.NFT.GetNFTOnWallet(address: str)
-nfts_info = await ATTools.NFT.GetNFTInfo(address: str)
-collection_info = await ATTools.NFT.GetNFTCollectionInfo(address: str)
-```
+  ```python
+  import ATTools
+  
+  
+  nfts_on_wallet = await ATTools.NFT.GetNFTOnWallet(address: str)
+  nfts_info = await ATTools.NFT.GetNFTInfo(address: str)
+  collection_info = await ATTools.NFT.GetNFTCollectionInfo(address: str)
+  ```
