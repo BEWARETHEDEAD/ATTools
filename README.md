@@ -24,7 +24,7 @@ pip install ATTools
 - TonConnect:
     - update the proof algorithm
  
-- NFT:
+- NFT (new block):
     - viewing NFT on a wallet
     - viewing information about NFT
     - viewing information about the NFT collection
