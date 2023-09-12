@@ -29,7 +29,7 @@ pip install ATTools
 
 
 # 🧭 Navigation
-- [🔗 Rest Requests](#rest-requests)
+- [🔗 Rest Requests](#%F0%9F%94%97-rest-requests)
 -
 - [🌕 Jettons](#jettons)
     - [Jetton Analyze](#jetton-analyze)
@@ -58,7 +58,6 @@ pip install ATTools
 - [🖼 NFT](#nft)
 
 ## 🔗 Rest Requests
-## Rest Requests <!-- anchor: rest-requests -->
 ```python
 import ATTools
 
