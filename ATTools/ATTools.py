@@ -35,23 +35,22 @@ import functools #pip install functools
 
 
 # Wraper in Namespace for Payments() child methods
+async def convert_to_namespace(data):
+    if isinstance(data, dict):
+        return Namespace(**{key: await convert_to_namespace(value) for key, value in data.items()})
+    elif isinstance(data, list):
+        return [await convert_to_namespace(item) for item in data]
+    else:
+        return data
+
+
 def wrap_result_in_namespace(func):
 	async def wrapper(*args, **kwargs):
 		result = await func(*args, **kwargs)
 		
-		def convert_to_namespace(data):
-			if isinstance(data, dict):
-				return Namespace(**{key: convert_to_namespace(value) for key, value in data.items()})
-			elif isinstance(data, list):
-				return [convert_to_namespace(item) for item in data]
-			else:
-				return data
-		
-		return convert_to_namespace(result)
+		return await convert_to_namespace(result)
 	
 	return wrapper  
-
-
 
 
 
@@ -271,7 +270,8 @@ class Wallets():
 		return Wallet_DT(
 			address=wallet.address,
 			balance=WalletManager.GetBalanceByWallet(wallet.address),
-			transactions=WalletManager.GetTransactions(wallet.address)
+			transactions=WalletManager.GetTransactions(wallet.address),
+			nft=NFT.GetNFTOnWallet(address=wallet.address)
 		)
 
 
@@ -279,9 +279,9 @@ class Wallets():
 # Wallet manage
 class WalletManager():
 
-	async def TonConnect(url_path_to_json: str, provider: str, payload: str, use_tonapi: bool, tonapi_token: str): # by davlgames
+	async def TonConnect(url_path_to_json: str, provider: str, payload: str): # by davlgames
 
-		connector = AsyncConnector(url_path_to_json, use_tonapi, tonapi_token)
+		connector = AsyncConnector(url_path_to_json)
 		connect_url = await connector.connect(provider, payload)
 
 		return connector, connect_url
@@ -301,6 +301,94 @@ class WalletManager():
 
 		resp = await WalletManager.GetInfoByWallet(address)
 		return int(resp.json['result']['balance'])/(10**9)
+
+
+
+# NFT manage
+class NFT():
+
+	async def GetNFTOnWallet(address: str = '', provider: str = None):
+
+		headers = {
+			'Content-Type': 'application/json'
+		}
+
+		query = """
+			query NftItemConnection($ownerAddress: String!, $first: Int!, $after: String) {
+			  nftItemsByOwner(ownerAddress: $ownerAddress, first: $first, after: $after) {
+			    cursor
+			    items {
+			      id
+			      name
+			      address
+			      index
+			      kind
+			      image: content {
+			        type: __typename
+			        ... on NftContentImage {
+			          originalUrl
+			          thumb: image {
+			            sized(width: 480, height: 480)
+			          }
+			        }
+			        ... on NftContentLottie {
+			          preview: image {
+			            sized(width: 480, height: 480)
+			          }
+			        }
+			        ... on NftContentVideo {
+			          cover: preview(width: 480, height: 480)
+			        }
+			      }
+			      collection {
+			        address
+			        name
+			        isVerified
+			      }
+			      sale {
+			        ... on NftSaleFixPrice {
+			          fullPrice
+			        }
+			      }
+			    }
+			  }
+			 }
+		"""
+
+		data = {
+			"query": query,
+			"variables": {
+				"ownerAddress": str(address),
+				"first": 24
+			}
+		}
+
+		resp = await Rest.post(url='https://api.getgems.io/graphql', json=data, headers=headers)
+
+		return await convert_to_namespace(resp.json['data']['nftItemsByOwner'])
+
+
+	async def GetNFTInfo(address: str = '', provider: str = None): # Provider: TonCat
+
+		headers = {
+			'Content-Type': 'application/json'
+		}
+
+		resp = await Rest.get(url=f'https://api.ton.cat/v2/contracts/nft_item/{address}', headers=headers)
+		resp.json['collection_info'] = NFT.GetNFTCollectionInfo(address=resp.json['nft_item']['collection_address'])
+
+		return await convert_to_namespace(resp.json)
+
+
+	async def GetNFTCollectionInfo(address: str = '', provider: str = None): # Provider: TonCat
+
+		headers = {
+			'Content-Type': 'application/json'
+		}
+
+		resp = await Rest.get(url=f'https://api.ton.cat/v2/contracts/nft_collection/{address}', headers=headers)
+
+		return await convert_to_namespace(resp.json)
 
 
 # Payment systems
