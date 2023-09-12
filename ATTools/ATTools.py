@@ -8,7 +8,7 @@ from typing import Any
 from types import CoroutineType
 import asyncio #pip install asyncio
 import aiohttp #pip install aiohttp
-from tonconnect.connector import AsyncConnector #pip install tonconnect
+from tonconnect.connector import AsyncConnector
 from dedust.api import API #pip install dedust
 from dedust.tokens import Token #pip install dedust
 import traceback
