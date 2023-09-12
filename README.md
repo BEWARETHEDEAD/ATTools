@@ -1,7 +1,7 @@
  # ATTools
 Analyticks Ton Tools
 
-cur: v.0.1.5
+cur: v.0.1.6
 
 **Installation**
 ```shell
@@ -21,9 +21,6 @@ pip install ATTools
     - transfers
     - NFT transfers
     - viewing NFT on a wallet
- 
-- TonConnect:
-    - update the proof algorithm
  
 - NFT (new block):
     - viewing NFT on a wallet
