@@ -16,9 +16,12 @@ pip install ATTools
 - Payment Systems:
     - Wallet Pay
  
-- Wallet
+- Wallet:
     - transfers
     - NFT transfers
+ 
+- TonConnect:
+    - update the proof algorithm
 
 
 # 🧭 Navigation
