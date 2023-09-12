@@ -8,6 +8,10 @@ cur: v.0.1.2
 pip install git+https://github.com/BEWARETHEDEAD/ATTools.git
 ```
 
+```shell
+pip install ATTools
+```
+
 # ⏳ Soon
 - Payment Systems:
     - Wallet Pay
