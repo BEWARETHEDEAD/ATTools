@@ -20,12 +20,8 @@ pip install ATTools
 - Wallet:
     - transfers
     - NFT transfers
-    - viewing NFT on a wallet
  
-- NFT (new block):
-    - viewing NFT on a wallet
-    - viewing information about NFT
-    - viewing information about the NFT collection
+- NFT:
     - NFT transfers
 
 - Data Providers (new block)
@@ -58,6 +54,8 @@ pip install ATTools
         - [CryptoBot About](#cryptobot-about)
         - [CryptoBot Invoices](#cryptobot-invoices)
         - [CryptoBot Exchange](#cryptobot-exchange)
+     
+- [🖼 NFT](#nft)
      
 ## 🔗 Rest Requests
 ```python
@@ -130,6 +128,7 @@ wallet = await ATTools.Wallets(toncenter_api_key: str, mnemonics: str)
 wallet_address = wallet.address
 wallet_balance = await wallet.balance
 wallet_transactions = await wallet.transactions
+wallet_nfts = await wallet.nft
 ```
 
 ## Wallet Manager
@@ -433,3 +432,13 @@ wallet_balance = await ATTools.WalletManager.GetBalanceByWallet(address: str)
           paid_btn_url: str
       )
       ```
+
+# 🖼 NFT
+```python
+import ATTools
+
+
+nfts_on_wallet = await ATTools.NFT.GetNFTOnWallet(address: str)
+nfts_info = await ATTools.NFT.GetNFTInfo(address: str)
+collection_info = await ATTools.NFT.GetNFTCollectionInfo(address: str)
+```
