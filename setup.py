@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="ATools",
-    version="0.1.2",
-    packages=["ATools"],
+    name="ATTools",
+    version="0.1.4",
+    packages=["ATTools"],
     install_requires=[
         'asyncio',
         'aiohttp',
