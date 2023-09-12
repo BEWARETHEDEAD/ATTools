@@ -12,7 +12,7 @@ pip install git+https://github.com/BEWARETHEDEAD/ATTools.git
 pip install ATTools
 ```
 
-# ⏳ Soon
+# ⏳ Soon ...
 - Payment Systems:
     - Wallet Pay
     - integration to telegram-bot by injection (?)
