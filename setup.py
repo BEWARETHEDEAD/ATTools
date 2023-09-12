@@ -2,12 +2,11 @@ from setuptools import setup, find_packages
 
 setup(
     name="ATTools",
-    version="0.1.5",
+    version="0.1.6",
     packages=["ATTools"],
     install_requires=[
         'asyncio',
         'aiohttp',
-        'tonconnect',
         'dedust',
         'xjet',
         'tontools',     
