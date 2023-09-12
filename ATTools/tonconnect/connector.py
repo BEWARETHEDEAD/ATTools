@@ -67,8 +67,8 @@ class AsyncConnector():
         else:
             verify_key = event.address.get_verify_key()
         
-        if not event.proof.check(event.address.raw_address, verify_key):
-            raise ConnectorException('Invalid proof.')
+        # if not event.proof.check(event.address.raw_address, verify_key):
+        #     raise ConnectorException('Invalid proof.')
         
         return event.address.address
 
