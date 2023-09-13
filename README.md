@@ -156,7 +156,8 @@ address = await connector.get_address()
 
 wallet_transactions = await ATTools.WalletManager.GetTransactions(address: str, limit: int, offset: int)
 wallet_info = await ATTools.WalletManager.GetInfoByWallet(address: str)
-wallet_balance = await ATTools.WalletManager.GetBalanceByWallet(address: str)
+wallet_ton_balance = await ATTools.WalletManager.GetBalanceByWallet(address: str)
+wallet_full_balance = await ATTools.Analyze.GetFullWalletBalance(address: str)
 ```
 
 
