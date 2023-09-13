@@ -18,7 +18,6 @@ pip install ATTools
     - integration to telegram-bot by injection (?)
  
 - Wallet:
-    - transfers
     - NFT transfers
  
 - NFT:
