@@ -101,6 +101,7 @@ jetton = await jetton.update()
 ```python
 import ATTools
 
+jetton_by_name = await ATTools.Analyze.GetJettonByName(token_name: str)
 
 jetton_full_info = await ATTools.Analyze.GetJettonFullInfo(token_name: str)
 jetton_pair = await ATTools.Analyze.GetJettonPair(token_name: str)
