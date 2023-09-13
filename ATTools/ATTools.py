@@ -282,23 +282,20 @@ class Wallets():
 		client = TonCenterClient(toncenter_api_key)
 		wallet = Wallet(provider=client, mnemonics=mnemonics, version='v4r2')
 
-		self.wallet = Namespace(
-			address=wallet.address,
-			balance=Analyze.GetFullWalletBalance(wallet.address),
-			transactions=WalletManager.GetTransactions(wallet.address),
-			nft=NFT.GetNFTOnWallet(address=wallet.address),
-			wallet_obj=wallet
-		)
-
+		self.address = wallet.address
+		self.balance = Analyze.GetFullWalletBalance(wallet.address)
+		self.transactions = WalletManager.GetTransactions(wallet.address)
+		self.nft = NFT.GetNFTOnWallet(address=wallet.address)
+		self.wallet_obj = wallet
 
 	async def Transfer(self, destination_address: str = '', token_name: str = '', amount: float = 0, message: str = '', fee: float = 0):
 
 		if token_name == '':
-			return await self.wallet.wallet_obj.transfer_ton(destination_address, amount, message)
+			return await self.wallet_obj.transfer_ton(destination_address, amount, message)
 		else:
-			token = found_data = next((item for item in await self.wallet.balance if hasattr(item, 'metadata') and hasattr(item.metadata, 'name') and item.metadata.name == token_name), None)
+			token = found_data = next((item for item in await self.balance if hasattr(item, 'metadata') and hasattr(item.metadata, 'name') and item.metadata.name == token_name), None)
 			if token != None:
-				return await self.wallet.wallet_obj.transfer_jetton(destination_address, token.jetton_address, amount, fee)
+				return await self.wallet_obj.transfer_jetton(destination_address, token.jetton_address, amount, fee)
 			else:
 				return f'not found token {token_name} on your wallet!'
 
