@@ -29,19 +29,19 @@ import functools #pip install functools
 # DeDust.io
 # fck.dev
 # ton.cat
-
+# tonapi.io
 
 
 
 
 # Wraper in Namespace for Payments() child methods
 async def convert_to_namespace(data):
-    if isinstance(data, dict):
-        return Namespace(**{key: await convert_to_namespace(value) for key, value in data.items()})
-    elif isinstance(data, list):
-        return [await convert_to_namespace(item) for item in data]
-    else:
-        return data
+	if isinstance(data, dict):
+		return Namespace(**{key: await convert_to_namespace(value) for key, value in data.items()})
+	elif isinstance(data, list):
+		return [await convert_to_namespace(item) for item in data]
+	else:
+		return data
 
 
 def wrap_result_in_namespace(func):
@@ -82,8 +82,12 @@ class Rest():
 
 			response_status = response.status
 
-			response_text = await response.text(encoding='UTF-8')
-			response_json = await response.json()
+			try:
+				response_text = await response.text(encoding='UTF-8')
+				response_json = await response.json()
+			except Exception as e:
+				#traceback.print_exc()
+				pass
 
 		return Response(type='get', url=url, headers=headers, json_data=json, data=data, status=response_status, text=response_text, json=response_json)
 
@@ -99,8 +103,12 @@ class Rest():
 
 			response_status = response.status
 
-			response_text = await response.text(encoding='UTF-8')
-			response_json = await response.json()
+			try:
+				response_text = await response.text(encoding='UTF-8')
+				response_json = await response.json()
+			except Exception as e:
+				#traceback.print_exc()
+				pass
 
 		return Response(type='post', url=url, headers=headers, json_data=json, data=data, status=response_status, text=response_text, json=response_json)
 
@@ -136,6 +144,12 @@ class Jettons():
 
 # Analyze Data
 class Analyze():
+
+	async def GetJettonByName(token_name: str): # Providers: TonAPI
+
+		resp = await Rest.get(url=f'https://tonapi.io/v2/accounts/search?name={token_name}')
+		return await convert_to_namespace(resp.json)
+
 
 	async def GetJettonFullInfo(token_name: str): # Providers: FCK
 
@@ -250,30 +264,43 @@ class Analyze():
 		return await Rest.get(url=f'https://api.ton.cat/v2/contracts/jetton_wallet/{jettonwallet_address}')
 
 
+	async def GetFullWalletBalance(address: str):
 
-# Wallet DataType
-class Wallet_DT(Namespace):
+		def filter_non_zero_balance(item):
+			return item["balance"] != '0'
 
-	async def transfer(self):
+		resp = await Rest.get(f'https://tonapi.io/v1/jetton/getBalances?account={address}')
+		resp.json['balances'].append(await WalletManager.GetBalanceByWallet(address))
+		return await convert_to_namespace(list(filter(filter_non_zero_balance, resp.json['balances'])))
 
-		pass
 
 
-# Wallet decorator
 class Wallets():
 
-	async def init(toncenter_api_key: str, mnemonics: str):
+	def __init__(self, toncenter_api_key: str = '', mnemonics: list = []):
 
-		client = TonCenterClient(api_key)
+		client = TonCenterClient(toncenter_api_key)
 		wallet = Wallet(provider=client, mnemonics=mnemonics, version='v4r2')
 
-		return Wallet_DT(
+		self.wallet = Namespace(
 			address=wallet.address,
-			balance=WalletManager.GetBalanceByWallet(wallet.address),
+			balance=Analyze.GetFullWalletBalance(wallet.address),
 			transactions=WalletManager.GetTransactions(wallet.address),
-			nft=NFT.GetNFTOnWallet(address=wallet.address)
+			nft=NFT.GetNFTOnWallet(address=wallet.address),
+			wallet_obj=wallet
 		)
 
+
+	async def Transfer(self, destination_address: str = '', token_name: str = '', amount: float = 0, message: str = '', fee: float = 0):
+
+		if token_name == '':
+			return await self.wallet.wallet_obj.transfer_ton(destination_address, amount, message)
+		else:
+			token = found_data = next((item for item in await self.wallet.balance if hasattr(item, 'metadata') and hasattr(item.metadata, 'name') and item.metadata.name == token_name), None)
+			if token != None:
+				return await self.wallet.wallet_obj.transfer_jetton(destination_address, token.jetton_address, amount, fee)
+			else:
+				return f'not found token {token_name} on your wallet!'
 
 
 # Wallet manage
@@ -300,7 +327,7 @@ class WalletManager():
 	async def GetBalanceByWallet(address):
 
 		resp = await WalletManager.GetInfoByWallet(address)
-		return int(resp.json['result']['balance'])/(10**9)
+		return {"balance": int(resp.json['result']['balance']), "metadata": {"address": address, "decimals": 9, "image": "", "name": "Toncoin", "symbol": "TON"}}
 
 
 
@@ -316,41 +343,41 @@ class NFT():
 		query = """
 			query NftItemConnection($ownerAddress: String!, $first: Int!, $after: String) {
 			  nftItemsByOwner(ownerAddress: $ownerAddress, first: $first, after: $after) {
-			    cursor
-			    items {
-			      id
-			      name
-			      address
-			      index
-			      kind
-			      image: content {
-			        type: __typename
-			        ... on NftContentImage {
-			          originalUrl
-			          thumb: image {
-			            sized(width: 480, height: 480)
-			          }
-			        }
-			        ... on NftContentLottie {
-			          preview: image {
-			            sized(width: 480, height: 480)
-			          }
-			        }
-			        ... on NftContentVideo {
-			          cover: preview(width: 480, height: 480)
-			        }
-			      }
-			      collection {
-			        address
-			        name
-			        isVerified
-			      }
-			      sale {
-			        ... on NftSaleFixPrice {
-			          fullPrice
-			        }
-			      }
-			    }
+				cursor
+				items {
+				  id
+				  name
+				  address
+				  index
+				  kind
+				  image: content {
+					type: __typename
+					... on NftContentImage {
+					  originalUrl
+					  thumb: image {
+						sized(width: 480, height: 480)
+					  }
+					}
+					... on NftContentLottie {
+					  preview: image {
+						sized(width: 480, height: 480)
+					  }
+					}
+					... on NftContentVideo {
+					  cover: preview(width: 480, height: 480)
+					}
+				  }
+				  collection {
+					address
+					name
+					isVerified
+				  }
+				  sale {
+					... on NftSaleFixPrice {
+					  fullPrice
+					}
+				  }
+				}
 			  }
 			 }
 		"""
