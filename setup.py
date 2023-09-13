@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="ATTools",
-    version="0.1.7",
+    version="0.1.8",
     packages=["ATTools"],
     install_requires=[
         'asyncio',
