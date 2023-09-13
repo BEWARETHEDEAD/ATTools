@@ -120,7 +120,14 @@ jettonwallet_owner = await ATTools.Analyze.GetJettonwalletOwner(jettonwallet_add
 import ATTools
 
 
-wallet = await ATTools.Wallets(toncenter_api_key: str, mnemonics: str)
+wallet = ATTools.Wallets(toncenter_api_key: str, mnemonics: list)
+
+# Transfer TON
+await wallet.Transfer(destination_address: str, amount: float)
+
+# Transfer Jetton
+await wallet.Transfer(destination_address: str, token_name: str, amount: float, fee: float)
+
 
 # answer data
 
