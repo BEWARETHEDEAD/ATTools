@@ -54,6 +54,22 @@ def wrap_result_in_namespace(func):
 
 
 
+class Providers():
+
+	class DeDust():
+
+		async def GetJettonInfo(contract: str):
+			return f'https://api.dedust.io/v2/jettons/{contract}/metadata'
+
+
+	class TonApi():
+
+		async def GetJettonInfo(contract: str):
+			return f'https://tonapi.io/v1/jetton/getInfo?account={contract}'
+
+
+
+
 # Respone DataType
 class Response(Namespace):
 	async def update(self):
@@ -126,19 +142,27 @@ class Jettons():
 
 	async def get(contract):
 
-		resp = await Analyze.GetJettonInfo(contract)
-		js = resp.json
-		jetton_full_info = await Analyze.GetJettonFullInfo(js["name"])
-		js["contract"] = contract
-		js["lp_contract"] = jetton_full_info["dedust_lp_address"]
+		for i in [Providers.DeDust, Providers.TonApi]:
+			try:
 
-		return Jetton(
-			**js, 
-			price=Analyze.GetJettonPrice(contract),
-			liquidity=Analyze.GetJettonLiquidity(js["name"]),
-			graph_data=Analyze.GetJettonGraphData(js["name"]),
-			providers=Analyze.GetJettonProviders(js["lp_contract"])
-		)
+				resp = await Analyze.GetJettonInfo(contract, provider=i)
+				js = resp.json['metadata']
+				
+				jetton_full_info = await Analyze.GetJettonFullInfo(js["name"])
+				js["contract"] = contract
+				js["lp_contract"] = jetton_full_info["dedust_lp_address"]
+
+				return Jetton(
+					**js, 
+					price=Analyze.GetJettonPrice(contract),
+					liquidity=Analyze.GetJettonLiquidity(js["name"]),
+					graph_data=Analyze.GetJettonGraphData(js["name"]),
+					providers=Analyze.GetJettonProviders(js["lp_contract"])
+				)
+
+			except Exception as e:
+				#traceback.print_exc()
+				pass
 
 
 
@@ -169,9 +193,12 @@ class Analyze():
 		return pair
 
 
-	async def GetJettonInfo(contract: str): # Providers: DEDUST
+	async def GetJettonInfo(contract: str, provider: Providers): # Providers: DEDUST, TONAPI
 
-		return await Rest.get(url=f'https://api.dedust.io/v2/jettons/{contract}/metadata')
+		cf = current_function = inspect.currentframe().f_code
+		url = getattr(provider, str(cf.co_name))
+
+		return await Rest.get(url=await url(contract))
 
 
 	async def GetJettonPrice(contract: str): # Providers: DEDUST | by dalvgames
