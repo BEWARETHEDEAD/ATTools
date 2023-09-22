@@ -1,7 +1,10 @@
  # ATTools
 Analyticks Ton Tools
 
-cur: v.0.1.8
+cur: v.0.2.0
+
+# ⚙️ UTILITIES:
+  [🤖][TON Inspect](https://t.me/toninsbot)
 
 **Installation**
 ```shell
@@ -30,8 +33,17 @@ pip install ATTools
 # 🧭 Navigation
 - [🔗 Rest Requests](#-rest-requests)
 -
+- [📦 Wrap Data](#-wrap-data)
+    - [Check Raw](#check-raw)
+    - [Pack Raw](#pack-raw)
+    - [UnPack Raw](#unpack-raw)
+- 
 - [🌕 Jettons](#-jettons)
     - [Jetton Analyze](#jetton-analyze)
+-
+- [🔎 Analyze](#-analyze)
+- 
+- [🔗 Blockchain](#-blockchain)
 -     
 - [👛 Wallet](#-wallet)
     - [Wallet Manager](#wallet-manager)
@@ -75,6 +87,26 @@ text_answer = response.text
 response = await response.update()
 ```
 
+## 📦 Wrap Data
+   ### Check Raw
+   ```python
+   import ATTools
+
+   bounceable_address = await ATTools.WrapData.CheckRaw(contract: str)
+   ```
+   ### Pack Raw
+   ```python
+   import ATTools
+
+   bounceable_address = await ATTools.WrapData.PackRaw(contract: str)
+   ```
+   ### UnPack Raw
+   ```python
+   import ATTools
+
+   non_bounceable_address = await ATTools.WrapData.UnPackRaw(contract: str)
+   ```
+
 ## 🌕 Jettons
 ```python
 import ATTools
@@ -83,18 +115,26 @@ jetton = await ATTools.Jettons.get(contract: str)
 
 # answer data
 
-jetton_info = jetton.jetton_full_info
-jetton_contract = jetton.contract
-jetton_lp_contract = jetton.lp_contract
-
-jetton_price = await jetton.price
-jetton_liquidity = await jetton.liquidity
-jetton_graph_data = await jetton.graph_data
-jetton_providers = await jetton.providers
+address = jetton.address
+raw_address = jetton.raw_address
+lp_address = jetton.lp_address
+name = jetton.name
+symbol = jetton.symbol
+description = jetton.description
+decimals = jetton.decimals
+price = await jetton.price
+liquidity = await jetton.liquidity
+graph_data = await jetton.graph_data
+liquidity_providers = await jetton.providers
 
 # sending a repeated request by a variable reference
-
 jetton = await jetton.update()
+
+# another jettons methods
+minter = await ATTools.Jettons.CreateJettonMinter(address: str)
+mint_body = await ATTools.Jettons.CreateMintBody(address: str, mint_amount: int)
+change_owner_body = await ATTools.Jettons.CreateChangeOwnerBody(address: str)
+burn_body = await ATTools.Jettons.CreateBurnBody(burn_amount: int)
 ```
 
 ## Jetton Analyze
@@ -112,8 +152,25 @@ jetton_graph_data = await ATTools.Analyze.GetJettonGraphData(token_name: str)
 jetton_providers = await ATTools.Analyze.GetJettonProviders(lp_contract: str)
 jetton_holders = await ATTools.Analyze.GetHoldersByContract(contract: str, limit: int)
 jetton_lp_price = await ATTools.Analyze.GetLpPrice(contract: str)
+jetton_lp_address = await ATTools.Analyze.GetJettonLpAddress(address: str, is_stable: bool)
 
 jettonwallet_owner = await ATTools.Analyze.GetJettonwalletOwner(jettonwallet_address: str)
+```
+
+## 🔎 Analyze
+```
+import ATTools
+
+address_info = await ATTools.Analyze.GetInfoOfAddress(address: str)
+dedust_pools = await ATTOols.Analyze.GetPools()
+address_from_domain = await ATTools.Analyze.ResolveDomain(domain: str)
+```
+
+## 🔗 Blockchain
+```
+import ATTools
+
+send_boc = await ATTools.Blockchain.SendBoc(boc: str)
 ```
 
 ## 👛 Wallet
@@ -136,6 +193,10 @@ wallet_address = wallet.address
 wallet_balance = await wallet.balance
 wallet_transactions = await wallet.transactions
 wallet_nfts = await wallet.nft
+
+# mint jettons
+min_new_jetton = await wallet.MintJettons(mint_amount: int, jetton_content_uri: str)
+#ex: 'https://raw.githubusercontent.com/yungwine/pyton-lessons/master/lesson-6/token_data.json'
 ```
 
 ## Wallet Manager
