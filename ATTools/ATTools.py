@@ -1,6 +1,7 @@
 from argparse import Namespace
 from types import SimpleNamespace as Namespace
 from functools import wraps #pip install functools
+from functools import partial
 from types import FunctionType
 from types import MethodType
 from types import GeneratorType
@@ -16,11 +17,19 @@ from xjet import JetAPI #pip install xjet
 from TonTools import * #pip install tontools
 import inspect
 import functools #pip install functools
+import os
+from tonsdk.utils import Address, bytes_to_b64str #pip install tonsdk
+from tonsdk.boc import begin_cell, Slice, Cell
+from base64 import b64decode
+from tonsdk.contract.token.ft import JettonMinter, JettonWallet
+from tonsdk.utils import to_nano, bytes_to_b64str
+from tonsdk.contract.wallet import Wallets, WalletVersionEnum
 
+import logging
 
 
 # DEV's:
-# @dmitriypyc (help)
+# @shibdev (help)
 # @beware_the_dead (main)
 # @dalvgames (help)
 
@@ -56,16 +65,53 @@ def wrap_result_in_namespace(func):
 
 class Providers():
 
+	async def providers(self, method_name):
+
+		matching_methods = []
+		def find_methods_in_class(class_obj):
+			members = inspect.getmembers(class_obj)
+			for name, member in members:
+				if not '__' in name and name != 'providers':
+					matching_methods.append(f"{class_obj.__qualname__}.{name}")
+
+			for base_class in class_obj.__bases__:
+				find_methods_in_class(base_class)
+
+		find_methods_in_class(self.__class__)
+		return matching_methods
+
+
 	class DeDust():
 
-		async def GetJettonInfo(contract: str):
-			return f'https://api.dedust.io/v2/jettons/{contract}/metadata'
+		def __init__(self):
+			self.url = 'https://api.dedust.io/v2'
+
+		async def GetJettonInfo(self, contract: str = ''):
+			return f'{self.url}/jettons/{contract}/metadata'
 
 
 	class TonApi():
 
-		async def GetJettonInfo(contract: str):
-			return f'https://tonapi.io/v1/jetton/getInfo?account={contract}'
+		def __init__(self):
+			self.url = 'https://tonapi.io/v1'
+
+		async def GetJettonInfo(self, contract: str = ''):
+			return f'{self.url}/jetton/getInfo?account={contract}'
+
+
+	class TonCat():
+
+		def __init__(self):
+			self.url = 'https://api.ton.cat/v2'
+
+		async def GetJettonInfo(self, contract: str = ''):
+			return f'{self.url}/contracts/jetton/{contract}'
+
+
+	class Toncenter():
+
+		def __init__(self):
+			self.url = 'https://toncenter.com/api/v2'
 
 
 
@@ -140,51 +186,253 @@ class Jetton(Namespace):
 # Jetton decorator
 class Jettons():
 
+	def __init__(self):
+		# Создаем экземпляр класса Providers
+		provider_instance = Providers()
+
+		# Добавляем метод find из Providers ко всем методам в классе M
+		for method_name in dir(self.__class__.__name__):
+			method = getattr(self.__class__.__name__, method_name)
+			if callable(method) and not method_name.startswith("__"):
+				partial_function = partial(provider_instance.provider, method_name)
+				setattr(method, f'providers', partial_function)
+
+
 	async def get(contract):
 
-		for i in [Providers.DeDust, Providers.TonApi]:
-			try:
+		try:
+			logging.debug(contract)
+			contract = await WrapData.CheckRaw(contract)
+			lp_address = await Analyze.GetJettonLpAddress(contract)
+			provider = Providers.TonCat
+			resp = await Analyze.GetJettonInfo(contract, provider=provider)
+			jet = await WrapData.WrapJettonInfoToUniversal(resp.json, provider)
 
-				resp = await Analyze.GetJettonInfo(contract, provider=i)
-				js = resp.json['metadata']
-				
-				jetton_full_info = await Analyze.GetJettonFullInfo(js["name"])
-				js["contract"] = contract
-				js["lp_contract"] = jetton_full_info["dedust_lp_address"]
+			return Jetton(
+				address=contract,
+				raw_address=await WrapData.UnPackRaw(contract),
+				lp_address=lp_address,
+				name=jet.name,
+				symbol=jet.symbol,
+				description=jet.description,
+				decimals=jet.decimals, 
+				price=Analyze.GetJettonPrice(contract),
+				liquidity=Analyze.GetJettonLiquidity(contract),
+				graph_data=Analyze.GetJettonGraphData(jet.name),
+				providers=Analyze.GetJettonProviders(lp_address)
+			)
 
-				return Jetton(
-					**js, 
-					price=Analyze.GetJettonPrice(contract),
-					liquidity=Analyze.GetJettonLiquidity(js["name"]),
-					graph_data=Analyze.GetJettonGraphData(js["name"]),
-					providers=Analyze.GetJettonProviders(js["lp_contract"])
-				)
+		except Exception as e:
+			traceback.print_exc()
+			return traceback.format_exc()
+			pass
 
-			except Exception as e:
-				#traceback.print_exc()
-				pass
 
+	async def CreateJettonMinter(address: str = '', jetton_content_uri: str = ''):
+		minter = JettonMinter(admin_address=Address(address),
+			jetton_content_uri=jetton_content_uri, #ex: 'https://raw.githubusercontent.com/yungwine/pyton-lessons/master/lesson-6/token_data.json'
+			jetton_wallet_code_hex=JettonWallet.code)
+
+		return minter
+
+
+	async def CreateMintBody(address: str = '', mint_amount: int = 0, jetton_content_uri: str = ''):
+		minter = await CreateJettonMinter(jetton_content_uri=jetton_content_uri)
+
+		body = minter.CreateMintBody(destination=Address(address),
+			jetton_amount=to_nano(int(mint_amount), 'ton'))
+		return body
+
+
+	async def CreateChangeOwnerBody(address: str = '', jetton_content_uri: str = ''):
+		minter = await CreateJettonMinter(jetton_content_uri=jetton_content_uri)
+
+		body = minter.CreateChangeAdminBody(
+			new_admin_address=Address(address))
+		return body
+
+
+	async def CreateBurnBody(burn_amount: int = 0):
+		body = JettonWallet().CreateBurnBody(
+			jetton_amount=to_nano(int(burn_amount), 'ton'))
+		return body
+
+
+
+
+class WrapData():
+
+	async def CheckRaw(contract: str = ''):
+
+		if '0:' in str(contract):
+			return await WrapData.PackRaw(contract)
+		else:
+			return contract
+
+
+	async def PackRaw(contract: str = ''):
+
+		return Address(contract).to_string(1, 1, 1)
+
+
+	async def UnPackRaw(contract: str = ''):
+
+		bytess = Address(contract).to_buffer()
+		hex_string = '0:' + ''.join('{:02x}'.format(byte) for byte in bytess)
+		return hex_string[:-8]
+
+
+	async def WrapJettonInfoToUniversal(data: dict, provider: Providers):
+
+		provider_name = os.path.basename(provider.__name__)
+
+		ans = {}
+
+		if provider_name == 'TonCat':
+			logging.debug(data)
+			data=data["jetton"]["metadata"]
+			ans["name"] = data["name"]
+			ans["description"] = data["description"]
+			ans["symbol"] = data["symbol"]
+			ans["decimals"] = data["decimals"]
+			if data["image"]:
+				ans["image"] = data["image"]["original"]
+			else:
+				ans["image"] = {}
+
+		return Namespace(**ans)
 
 
 # Analyze Data
 class Analyze():
 
-	async def GetJettonByName(token_name: str): # Providers: TonAPI
+	def __init__(self):
+		# Create an instance of the Providers class
+		self.provider_instance = Providers()
+
+		# Add the 'provider' attribute to wrapper methods
+		for method_name in dir(self):
+			method = getattr(self, method_name)
+			if callable(method) and not method_name.startswith("__"):
+				# Create a wrapper method that calls the original method
+				def method_wrapper(*args, **kwargs):
+					return method(*args, **kwargs)
+
+				# Add the 'provider' attribute to the wrapper method
+				partial_function = partial(self.provider_instance.providers, method_name)
+				setattr(method_wrapper, 'providers', partial_function)
+
+				# Set the 'provider' attribute on the original method
+				setattr(self, method_name, method_wrapper)
+
+
+	async def ResolveDomain(self, domain: str = ''):
+		resp = await Rest.get(url=f'https://api.ton.cat/v2/contracts/dns/resolve?domain={domain}')
+		return await convert_to_namespace(resp.json)
+
+
+	async def GetPools(self):
+		resp = await Rest.get(url=f'https://api.dedust.io/v2/pools')
+		return resp.json
+
+
+	async def GetTokenInPool(self, address: str = '', pools: dict = {}):
+		pool = None
+		jetton_index = None
+		for pool in pools:
+			ton, jetton = False, False
+			for i, asset in enumerate(pool['assets']):
+				if asset['type'] == 'native' and asset['metadata']['symbol'] == 'TON':
+					ton = True
+				elif asset['type'] == 'jetton' and asset['address'] == address:
+					jetton = True
+					jetton_index = i
+			
+			if ton and jetton:
+				break
+		
+		return pool, jetton_index
+
+
+	async def GetPoolReserves(self, pool: dict = {}):
+		return tuple(map(int, pool['reserves']))
+
+
+	async def GetInfoOfAddress(self, address: str = ''):
+
+		address = await WrapData.CheckRaw(address)
+		resp = await Rest.get(url=f'https://tonviewer.com/_next/data/{address}.json?value={address}')
+
+		key = str(resp.text).split('"buildId":"')[1].split('"')[0]
+		resp = await Rest.get(url=f'https://tonviewer.com/_next/data/{key}/{address}.json?value={address}')
+
+		logging.debug(resp.json['pageProps'])
+		return await convert_to_namespace(resp.json['pageProps'])
+
+
+	async def GetTransactionInfo(self, hashs: str = '', include_msg_body: bool = True):
+
+		resp = await Rest.get(url=f'https://toncenter.com/api/index/getTransactionByHash?tx_hash={hashs}&include_msg_body={include_msg_body}')
+		
+		if resp.json == []:
+			await asyncio.sleep(1)
+			hashs = hashs.replace("+", "%2B").replace("=", "%3D").replace(f'_', "%2F")
+			resp = await Rest.get(url=f'https://toncenter.com/api/index/getTransactionByHash?tx_hash={hashs}&include_msg_body={include_msg_body}')
+
+		return await convert_to_namespace(resp.json[0])
+
+
+	async def GetJettonLpAddress(self, address: str = '', is_stable: bool = False): #by shibdev
+
+		address = Address(address) if type(address) == str else address
+
+		left_asset = bytes_to_b64str(begin_cell().store_uint(0, 4).end_cell().to_boc()) # NATIVE asset
+		right_asset = bytes_to_b64str(begin_cell().store_uint(1, 4).store_int(address.wc, 8).store_bytes(address.hash_part).end_cell().to_boc())
+
+		payload = {
+		  "id": 1,
+		  "jsonrpc": "2.0",
+		  "method": "runGetMethod",
+		  "params": {
+			"address": "EQBfBWT7X2BHg9tXAxzhz2aKiNTU1tpt5NsiK0uSDW_YAJ67",
+			"method": "get_pool_address",
+			"stack": [
+			  [
+				"int",
+				"1" if is_stable else "0"
+			  ],
+			  [
+				"tvm.Slice",
+				left_asset
+			  ],
+			  [
+				"tvm.Slice",
+				right_asset
+			  ]
+			]
+		  }
+		}
+
+		r = await Rest.post(url="https://toncenter.com/api/v2/jsonRPC", json=payload)
+		return Slice(Cell.one_from_boc(b64decode(r.json["result"]["stack"][0][1]["bytes"]))).read_msg_addr().to_string(1, 1, 1)
+
+
+	async def GetJettonByName(self, token_name: str = ''): # Providers: TonAPI
 
 		resp = await Rest.get(url=f'https://tonapi.io/v2/accounts/search?name={token_name}')
 		return await convert_to_namespace(resp.json)
 
 
-	async def GetJettonFullInfo(token_name: str): # Providers: FCK
+	async def GetJettonFullInfo(self, token_name: str = '', contract: str = ''): # Providers: FCK
 
 		jetton_lists = await Rest.get(url=f'https://api.fck.foundation/api/v1/jettons?includeAll=false')
-		filtered_list = [item for item in jetton_lists.json["data"] if item["name"] == token_name]
+		filtered_list = [item for item in jetton_lists.json["data"] if item["name"] == token_name and await WrapData.PackRaw(item["name"]) == contract]
 		return filtered_list[0]
 
 
-	async def GetJettonPair(token_name: str): # Providers: FCK
+	async def GetJettonPair(self, token_name: str = '', contract: str = ''): # Providers: FCK
 
-		ids = await Analyze.GetJettonFullInfo(token_name)
+		ids = await Analyze.GetJettonFullInfo(token_name, contract)
 
 		jetton_pairs = await Rest.get(url=f'https://api.fck.foundation/api/v3/jettons/pairs?jetton_ids={ids["id"]}&limit=10')
 		filtered_pair = jetton_pairs.json["pairs"].items()
@@ -193,15 +441,15 @@ class Analyze():
 		return pair
 
 
-	async def GetJettonInfo(contract: str, provider: Providers): # Providers: DEDUST, TONAPI
+	async def GetJettonInfo(self, contract: str = '', provider: Providers = Providers.TonCat):
 
 		cf = current_function = inspect.currentframe().f_code
-		url = getattr(provider, str(cf.co_name))
+		url = getattr(provider(), str(cf.co_name))
 
 		return await Rest.get(url=await url(contract))
 
 
-	async def GetJettonPrice(contract: str): # Providers: DEDUST | by dalvgames
+	async def GetJettonPrice(self, contract: str = ''): # Providers: DEDUST | by dalvgames
 
 		TOKEN = contract
 		api = API()
@@ -210,19 +458,22 @@ class Analyze():
 		return '{0:.9f}'.format(await token.get_price())
 
 
-	async def GetJettonLiquidity(token_name: str): # Providers: FCK
+	async def GetJettonLiquidity(self, contract: str = ''): # Providers: DeDust
 
-		pair = await Analyze.GetJettonPair(token_name)
-		return await Rest.get(url=f'https://api.fck.foundation/api/v3/analytics/liquidity?pairs={pair}&source=DeDust&period=h1')
+		pools = await Analyze.GetPools()
+		pool, jetton_index = await Analyze.GetTokenInPool(contract, pools)
+		ton_index = int(not jetton_index)
+		reserves = await Analyze.GetPoolReserves(pool)
+		return Namespace(tokens=format(reserves[jetton_index]/1e9, '.10f') if jetton_index != None else 0, ton=format(reserves[ton_index]/1e9, '.10f') if jetton_index != None else 0)
 
 
-	async def GetJettonGraphData(token_name: str): # Providers: FCK
+	async def GetJettonGraphData(self, token_name: str = '', contract: str = ''): # Providers: FCK
 
-		pair = await Analyze.GetJettonPair(token_name)
+		pair = await Analyze.GetJettonPair(token_name, contract)
 		return await Rest.get(url=f'https://api.fck.foundation/api/v3/analytics?pairs={pair}&page=1&period=h1&currency=TON')
 
 
-	async def GetJettonProviders(lp_contract: str): #by dmitriypyk
+	async def GetJettonProviders(self, lp_contract: str = ''): #by shibdev
 
 		data = await Analyze.GetHoldersByContract(lp_contract)
 		lp_price = await Analyze.GetLpPrice(lp_contract)
@@ -233,7 +484,7 @@ class Analyze():
 		return [{"address": i[1], "lp_balance": round(float(data[i[1]]), 3), "in_ton": round(float(data[i[1]]) * lp_price, 3)} for i in enumerate(data, start=1)]
 
 
-	async def GetHoldersByContract(contract: str, limit: int = 30): # Providers: TonCat | by dmitriypyk
+	async def GetHoldersByContract(self, contract: str = '', limit: int = 30): # Providers: TonCat | by shibdev
 
 		holders = None
 		result = {}
@@ -251,7 +502,7 @@ class Analyze():
 			return None
 
 
-	async def GetLpPrice(contract: str): # Providers: TonCat | by dmitriypyk
+	async def GetLpPrice(self, contract: str = ''): # Providers: TonCat | by shibdev
 
 		for i in range(3):
 
@@ -286,12 +537,12 @@ class Analyze():
 		return (jetton_liquidity) / lp_total_supply
 
 
-	async def GetJettonwalletOwner(jettonwallet_address: str):
+	async def GetJettonwalletOwner(self, jettonwallet_address: str = ''):
 
 		return await Rest.get(url=f'https://api.ton.cat/v2/contracts/jetton_wallet/{jettonwallet_address}')
 
 
-	async def GetFullWalletBalance(address: str):
+	async def GetFullWalletBalance(self, address: str = ''):
 
 		def filter_non_zero_balance(item):
 			return item["balance"] != '0'
@@ -301,8 +552,41 @@ class Analyze():
 		return await convert_to_namespace(list(filter(filter_non_zero_balance, resp.json['balances'])))
 
 
+class Blockchain():
 
-class Wallets():
+	async def SendBoc(boc: str = ''):
+
+		resp = await Rest.post(url=f'https://toncenter.com/api/v2/sendBoc', json={"boc": boc})
+		return resp.json
+
+
+	async def RunGetMethod(address: str = '', method: str = '', stack: list = []):
+
+		payload = {
+			"address": address.to_string(1, 1, 1) if type(address) == Address else address,
+			"method": method,
+			"stack": stack
+		}
+
+		resp = await Rest.post(url='https://toncenter.com/api/v2/runGetMethod', json=payload)
+		r = resp.json
+
+		stack = []
+		for s in r["result"]["stack"]:
+			if s[0] == "num":
+				stack.append({"type": "int", "value": int(s[1], 16)})
+			elif s[0] == "null":
+				stack.append({"type": "null"})
+			elif s[0] == "cell":
+				stack.append({"type": "cell", "value": Cell.one_from_boc(b64decode(s[1]["bytes"])).begin_parse()})
+			elif s[0] == "slice":
+				stack.append({"type": "slice", "value": Cell.one_from_boc(b64decode(s[1]["bytes"])).begin_parse()})
+			elif s[0] == "builder":
+				stack.append({"type": "builder", "value": Cell.one_from_boc(b64decode([1]["bytes"]))})
+		return stack
+
+
+class Wallet_():
 
 	def __init__(self, toncenter_api_key: str = '', mnemonics: list = []):
 
@@ -315,6 +599,7 @@ class Wallets():
 		self.nft = NFT.GetNFTOnWallet(address=wallet.address)
 		self.wallet_obj = wallet
 
+
 	async def Transfer(self, destination_address: str = '', token_name: str = '', amount: float = 0, message: str = '', fee: float = 0):
 
 		if token_name == '':
@@ -325,6 +610,22 @@ class Wallets():
 				return await self.wallet_obj.transfer_jetton(destination_address, token.jetton_address, amount, fee)
 			else:
 				return f'not found token {token_name} on your wallet!'
+
+
+	async def MintJettons(self, mint_amount: int = 0, jetton_content_uri: str = ''):
+
+		body = await Jettons.CreateMintBody(self.address, mint_amount, jetton_content_uri)
+		minter = await Jettons.CreateJettonMinter(self.address, jetton_content_uri)
+		seqno = await Blockchain.RunGetMethod(self.address, 'seqno')
+
+		query = await self.wallet_obj.create_transfer_message(to_addr=minter.address.to_string(),
+			amount=to_nano(0.04, 'ton'),
+			seqno=int(seqno),
+			payload=body
+		)
+
+		boc = bytes_to_b64str(query["message"].to_boc(False))
+		return await Blockchain.SendBoc(boc)
 
 
 # Wallet manage
