@@ -7,7 +7,6 @@ setup(
     install_requires=[
         'asyncio',
         'aiohttp',
-        'tonconnect',
         'dedust',
         'xjet',
         'tontools',
