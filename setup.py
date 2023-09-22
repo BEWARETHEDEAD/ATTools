@@ -2,14 +2,16 @@ from setuptools import setup, find_packages
 
 setup(
     name="ATTools",
-    version="0.1.9",
+    version="0.2.0",
     packages=["ATTools"],
     install_requires=[
         'asyncio',
         'aiohttp',
+        'tonconnect',
         'dedust',
         'xjet',
-        'tontools',     
+        'tontools',
+        'tonsdk'     
     ],
     project_urls={
         'Documentation': 'https://github.com/BEWARETHEDEAD/ATTools/tree/main'
