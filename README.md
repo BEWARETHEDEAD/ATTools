@@ -158,7 +158,7 @@ jettonwallet_owner = await ATTools.Analyze.GetJettonwalletOwner(jettonwallet_add
 ```
 
 ## 🔎 Analyze
-```
+```python
 import ATTools
 
 address_info = await ATTools.Analyze.GetInfoOfAddress(address: str)
@@ -167,7 +167,7 @@ address_from_domain = await ATTools.Analyze.ResolveDomain(domain: str)
 ```
 
 ## 🔗 Blockchain
-```
+```python
 import ATTools
 
 send_boc = await ATTools.Blockchain.SendBoc(boc: str)
