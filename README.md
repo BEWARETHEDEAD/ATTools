@@ -4,7 +4,7 @@ Analyticks Ton Tools
 cur: v.0.2.0
 
 # ⚙️ UTILITIES:
-  [🤖][TON Inspect](https://t.me/toninsbot)
+  [🤖][TON Inspect](https://t.me/toninsbot) (@toninsbot)
 
 **Installation**
 ```shell
